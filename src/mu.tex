@@ -1,0 +1,89 @@
+\section{$M$ Types}
+
+The \tmu \footnote{The Greek letter Mu} (in Idris code \verb|M|, both standing for multiplicity) type takes two arguments, $n : \nat$\footnote{Using standard Peano natural numbers} and $t : \tpe$, written as $M_n t$. 
+It has two (restricted constructors): $0_M$ and $\nsum$
+
+\begin{definition}
+	\label{muDef}
+	$M$ is polymorphic type of the signature $M : (n :_0 \nat) \to (t : \tpe \to \tpe$, with constructors $0_M : M_0 t$, and $\nsum : t \proc M_n t \proc M_{n+1} t$ \footnote{$\nsum$ is written as an infix operator, associating to the right ($(a \nsum b \nsum c)$ is equivalent to $(a \nsum (b \nsum c))$)}.
+\end{definition}
+
+\begin{figure}
+	\begin{minted}{idris}
+data M : (0 n : Nat) -> (t : Type) -> Type where
+	MS : (1 x : t) -> (1 xs : (Lazy (M n t))) -> M (S n) t
+	MZ : M Z t
+	\end{minted}
+	The Idris version of \ref{muDef}
+\end{figure}
+
+This is the exact same construction as \verb|LVect|\cite{idris_linear_lvect} and \verb|Copies|\cite{idris_linear_copies}.
+This is already noted by \citeauthor{inverse_of_type}, where they call the $M$ type exponentiation, which ultimately is the inspiration for \verb|Copies|. 
+However, \verb|Copies| mainly limits its view to \emph{specific} values of $n$, (specifically their number like properties), as opposed to generalized multiplicity information.
+
+Because of the elegance and brevity of their notation, we will often it instead of $M$.
+\begin{note}
+	$t^n$ is a notation for $M_n t$, and they are interchangeable
+\end{note}
+\subsection{Operations on \tmu}
+
+Just like \verb|LVect| and \verb|Copies| both have ways to "combine" many linear values into a larger collection of them (both use the name \verb|++|). 
+The equivalent operator for \tmu is called $\mcombine$ (\verb|combine| in Idris). 
+It has type $M_a t \proc M_b t \proc M_{a + b} t$ and is defined by these two equations:
+
+\begin{definition}
+	\begin{align}
+		(0_M \mcombine c) &\equiv c \\
+		((a \nsum b) \mcombine c) &\equiv (a \nsum (b \mcombine c)) 
+	\end{align}
+\end{definition}
+
+In addition, we have a function $\verb|joinM| : M_a M_b t \proc M_{a * b}$
+
+\begin{definition}
+	\begin{align}
+		(\mathtt{joinM} \ 0_M) &\equiv 0_M \\
+		(\mathtt{joinM} \ (a \nsum b)) &\equiv (a \mcombine (\mathtt{joinM} \ b))
+	\end{align}
+\end{definition}
+
+\subsection{Properties of \tmu}
+
+One of the benifits of exponential notation is that there are a number of properites of numbers that translate directly into properites of $M$.
+For instance, we might note that $t^1$ \footnote{Written with \tmu, $M_1 t$} is linearly isomorphic to $t$. 
+
+Likewise, $t^0$ is linearly isomorphic to $1$ (the unit type) as no information is contained within it.
+We also have properites of operations, for instance, the application of $\mcombine$ translate to the multiplication of the indices of the respective types.
+That is, if $a : t^m$, and $b : t^n$, then $a \mcombine b : t^{m + n}$.
+In addition, we have ${t^a}^b \liso t^{a * b}$.
+
+For more information on this notation and more in depth and broader information on the relations between multiplicities and general algebras, read \citetitle{inverse_of_type}
+
+\begin{remark}
+	\label{basicMuProps}
+	\begin{align}
+		t^1 &\liso t \\
+		t^0 &\liso () \\
+		{t^b}^a &\liso t^{a * b} \\
+		{t^b}^1 &\liso t^{1 * b} \liso t^b \\
+		{t^1}^a &\liso t^{1 * a} \liso t^a \\
+		{t^0}^a &\liso t^{0 * a} \liso t^0 \liso () \\
+		{t^b}^0 &\liso t^{b * 0} \liso t^0 \liso () 
+	\end{align}
+\end{remark}
+
+\subsection{Usages of $M$}
+
+\begin{lemma}
+	$M_n t$ always contains exactly $n$ linear bindings of $t$.
+\end{lemma}
+\begin{proof}
+	The case for $0$ is trivial (it must be of the form $0_M$ which contains $t$ zero times).
+	
+	Upon induction, we then have the goal $n \equiv (t \# M_n t) \vdash (n + 1) \equiv (t \# M_{n + 1})$.
+	The only constructor of $M_{n + 1}$ is $t \nsum r$, where $r : M_n$, we can then split these two to get $(t \# M_{n + 1} t) \redux (t \# t) + (t \# M_n t) \redux 1 + (t \# M_n t)$.
+	We then have $n \equiv (t \# M_n t) \vdash (n + 1) \equiv (1 + (t \# M_n t))$.
+	
+	By introduction of substitution we have $(n + 1) \equiv (1 + n)$, which, by associativity, is true.
+\end{proof}
+

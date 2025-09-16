@@ -1,0 +1,56 @@
+\section{$\omega$ Types for Simplicity and Performance}
+
+$M$ types can be used to model $\omega$ bindings, using a construction called $\omega$ types.
+%
+
+\begin{definition}
+	$\omega$ is function that returns a way to generate \tmu for any $n$.
+	This is equivalent to reasoning about any number of copies of a given value.
+	\begin{align}
+		&\omega : \tpe \to \tpe \\
+		&\omega \ t \equiv \prod_{n}^{\nat} \mu_n t
+	\end{align}
+\end{definition}
+
+In other we, there is no restriction on the number of times we can use $\omega$ types, it acts as a wildcard.
+There is a function from an $\omega$ binding to an $\omega$ type (called \verb|gen|), but the opposite is not true, due to the fact it would require the ability to transform "infinite" linear bindings to one unrestricted one, which isn't possible in Idris.
+
+\subsection{$\Omega$ types}
+
+There is one problem with the usage of $\omega$ types however, for instance, with the unrestricted version of \verb|joinN|.
+$\verb|joinN| : \omega (\omega \ t) \to \omega \ t$.
+However, in general, the return type dosen't actually exist for all possible multiplicities.
+
+Recall that $\verb|joinN| : \mu_a (\mu_b \ t) \to \mu_{a * b} \ t$. 
+This means that it isn't actually possible for all possible types. 
+For instance, consider $a + b$, where $a : \mu_2 t$ and $b : \omega$. 
+We would like to say that this has the type $\omega$, but this isn't true, as we can't get exactly $1$ instance of this.
+
+This problem is solved by the introduction of $\psi$ as a generalization of a $\omega$ type.
+Firstly, we must define a predicate, or, as it will be called here, a partition.
+
+\begin{definition}
+	A partition of a type $a$ is defined as $\tset a \equiv \prod_x^a \tpe$.
+	It maps values of $a$ to $\ast$'s.
+\end{definition}
+
+\begin{definition}
+	$e : t$ is "in" a given partition $S : \tset \ t$ (written $e \in S$) if and only if $S \ e$ is inhabited.
+	That is, the "set" of all elements in a given partition is all the values in the domain that, when applied the partition, produce types that are inhabited. 
+\end{definition}
+
+For instance, we might have the partition of all bools that are \verb|true|: 
+\begin{math}
+	\text{alt} : \tset Bool 
+	\text{alt} b = (b = True)
+\end{math}
+
+\begin{definition}
+	$\Omega : (t : \tpe) \to \{s : \tset \ \nat\} \to \tpe $
+	
+	$\Omega \ t \ \{s\} \equiv (n : \nat) \to [n \in s] \to M \ n \ t$.
+	
+	$\Omega t \{s\}$ may also be written as $\Omega_s t$
+\end{definition}
+
+Where $s$ is a "restriction" on the potential multiplicities.
