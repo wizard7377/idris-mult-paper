@@ -1,1 +1,35 @@
 \section{General Linear Interfaces}
+
+The regular \verb|Functor| interface does not work with linear types, as it has unrestricted bindings.
+Each types defines its own map function, for instance, \verb|LMaybe| defines: 
+
+\begin{minted}{idris}
+	(<$>) : (a -@ b) -> LMaybe a -@ LMaybe b
+	f <$> Nothing = Nothing
+	f <$> Just x = Just (f x)
+\end{minted}
+
+Firstly, let us create a "linear functor" interface of roughly the common shape:
+
+\begin{minted}{idris}
+	interface LFunctor (f : Type -> Type) where 
+		mapL : (a -@ b) -> (f a -@ f b)
+\end{minted}
+
+This uses an unrestricted binding, however, we can replace this with a $M$ type. 
+
+\subsection{From $\texttt{LFunctor}$ to $\texttt{NFunctor}$}
+
+A first attempt at this might simply replace the unrestricted binding with an $\omega$ type:
+
+\begin{minted}{idris}
+	interface LFunctor (f : Type -> Type) where 
+		mapL : w (a -@ b) -@ (f a -@ f b)
+\end{minted}
+
+This works, but is unnecessarily general, as for instance, we don't always know the number of values that we will need.
+Take, for instance, \verb|LVect 4|. 
+We don't actually \emph{need} an unrestricted number of functions, we need exactly $4$. 
+So to get around this, we can add a field to \verb|LFunctor| which I will herein call \verb|NFunctor| by the name of \verb|req| which is the number of functions "required" for a linear mapping.\footnote{It might be this needs to be generalized to $\Omega$ types}.
+
+Each call to \verb|mapN|, then, requires exactly \verb|req| multiplicity, so, for instance,
