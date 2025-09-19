@@ -1,6 +1,6 @@
 \section{General Linear Interfaces}
 
-The regular \verb|Functor| interface does not work with linear types, as it has unrestricted bindings.
+The regular \verb|Functor| interface does not work with linear types, as it has unrestricted bindings \cite{eb_idris_qtt_prac}.
 Each types defines its own map function, for instance, \verb|LMaybe| defines: 
 
 \begin{minted}{idris}
@@ -12,24 +12,54 @@ Each types defines its own map function, for instance, \verb|LMaybe| defines:
 Firstly, let us create a "linear functor" interface of roughly the common shape:
 
 \begin{minted}{idris}
-	interface LFunctor (f : Type -> Type) where 
+	interface NFunctor (f : Type -> Type) where 
 		mapL : (a -@ b) -> (f a -@ f b)
 \end{minted}
 
-This uses an unrestricted binding, however, we can replace this with a $M$ type. 
+This uses an unrestricted binding. 
+However, we can replace this with a $M$ type.
 
-\subsection{From $\texttt{LFunctor}$ to $\texttt{NFunctor}$}
+First, let us look at say, \verb|Data.Linear.LVect.(<$>)|:
 
-A first attempt at this might simply replace the unrestricted binding with an $\omega$ type:
+\begin{listing}
+	\begin{minted}{idris}
+		(<$>) : (f : a -@ b) -> LVect n a -@ LVect n b
+		f <$> [] = []
+		f <$> x :: xs = f x :: (f <$> xs)
+	\end{minted}
+	\caption{\texttt{LVect}'s \texttt{(<\$>)}}
+\end{listing}
 
-\begin{minted}{idris}
-	interface LFunctor (f : Type -> Type) where 
-		mapL : w (a -@ b) -@ (f a -@ f b)
-\end{minted}
 
-This works, but is unnecessarily general, as for instance, we don't always know the number of values that we will need.
-Take, for instance, \verb|LVect 4|. 
-We don't actually \emph{need} an unrestricted number of functions, we need exactly $4$. 
-So to get around this, we can add a field to \verb|LFunctor| which I will herein call \verb|NFunctor| by the name of \verb|req| which is the number of functions "required" for a linear mapping.\footnote{It might be this needs to be generalized to $\Omega$ types}.
+This requires $f$ unrestricted, even though we know its the same length as the vector.
+This is because it is applied once to each element.
+Therein, we know it would be preferable to state that we can, in general, for a given type, provide exactly a certain number of usages of the functions only.
 
-Each call to \verb|mapN|, then, requires exactly \verb|req| multiplicity, so, for instance,
+We could do this by introducing a field, \verb|req : Nat|.
+\begin{listing}
+	\begin{minted}{idris}
+		interface NFunctor (f : Type -> Type) where 
+			0 req : Nat
+			mapN : (M req (a -@ b)) -> (f a -@ f b)
+	\end{minted}
+	\caption{A second $\texttt{NFunctor}$}
+\end{listing}
+
+\subsection{Dependent Multiplicities}
+
+However, there is still one large problem with this. 
+What about \verb|LMaybe| and \verb|LList|?
+These require as many functions as there are elements, which is only known at runtime.
+To solve this, we need to generalize \verb|NFucntor| to a dependent multiplicity, specifically, we describe that \verb|NFunctor| is of the full type in \ref{full_nfun} \cite{dep_mult_dep_lin}.
+
+\begin{listing}
+	\label{full_nfun}
+	\begin{minted}{idris}
+		interface NFunctor (f : Type -> Type) where 
+			0 req : {a : Type} -> a -@ Nat
+			mapN' : (1 x : f a) -> (M (req x) (f a -@ f b)) -@ f b
+	\end{minted}
+	\caption{Final $\texttt{NFunctor}$}
+\end{listing}
+
+Note that we must swap the function and argument order, as the functions depend on the arguement, not the other way around.

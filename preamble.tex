@@ -2,15 +2,19 @@
 \usepackage{xcolor}
 \usepackage{amsthm}
 \usepackage{minted}
-\usepackage{listings}
+%\usepackage{listings}
 \usepackage{biblatex}
 \usepackage{amsmath}
+\usepackage{fancyvrb}
 \usepackage{amssymb}
 % \usepackage[utf8]{inputenc}
 % \usepackage{easyReview}
-% \usepackage{todonotes}
+\usepackage{todonotes}
 \usepackage{hyperref}
-% \usepackage{tikz}
+\usepackage{ebproof}
+\usepackage{microtype}
+\usepackage{tikz}
+\usepackage{tikz-cd}
 % \usetikzlibrary{}
 \addbibresource{bibliography.bib}
 
@@ -42,5 +46,14 @@
 \newcommand{\tpe}{\ensuremath{\ast}}
 \newcommand{\tset}{\ensuremath{\text{Part}}}
 \newcommand{\redux}{\ensuremath{\vartriangleright}}
-\newcommand{\mz}{\ensuremath{0_M}}
+\newcommand{\mz}{\ensuremath{\diamond}}
 \newcommand{\liso}{\ensuremath{\cong_1}}
+\newcommand{\nuse}[2]{\ensuremath{{#1}\#{#2}}}
+\newcommand{\lpair}{\ensuremath{\times^1}}
+\newcommand{\liniso}{\ensuremath{\cong_{\multimap}}}
+\hypersetup{
+	colorlinks   = true, %Colours links instead of ugly boxes
+	urlcolor     = blue, %Colour for external hyperlinks
+	linkcolor    = black, %Colour of internal links
+	citecolor   = black %Colour of citations
+}
