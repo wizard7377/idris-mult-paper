@@ -1,82 +1,52 @@
-\section{$M$ Types}
+\section{$M$ types}
 
-The most important construction described here is the $M$ type\footnote{Sometimes the linear exponent $type, \texttt{Copies}$}, which takes two arguments, a multiplicity $n : \nat$\footnote{$\nat$ is the type of natural numbers, in Idris $\texttt{Nat}$}, and a type $t : \ast$\cite{idris_prelude}.
-
-\begin{note}
-	$M \ n \ t$, $M_n t$, and $t^n$ are all different notations for the same type
-\end{note}
+To define $M$ types, we must first define \gls{type:source} types \cite{dep_mult_dep_lin}.
+This is equivalent to the \verb|linear|  "copies" type, which it is modeled after \cite{inverse_of_type, idris_linear}. 
+However, rather than \verb|Nil| and \verb|::|, we call its constructors instead $\mz$ (\verb|Exhaust|) and $\nsum$ (\verb|Provide|).
 
 \begin{definition}
-	$M$ has two constructors, $\mz$ and $\nsum$.
+	\gls{type:source} is a polymorphic inductive type indexed by \gls{type:nats} and $t$, where is some $t : \gls{type:tpe}$.
 	
-	$\mz$ acts as the trivial case for $M$, having a signature $\mz : M_0 t$.
-	It requires no arguments, and is restricted to only producing values where the first index of $M$ is $0$.
-	
-	$\nsum$ acts as the inductive case for $M$.
-	Its signature is $\nsum : t \proc M_n t \proc M_{S n} t$.
-	It "adds" one binding two an existing $M_n$, and returns a $M$ whose index is the successor of the arguments index. 
+	It has two constructors, $\mz : \gls{type:source} \ 0 \ x$, and $\nsum : (x : t) \proc \gls{type:source} \ n \ x \proc \gls{type:source} \ (S n) \ x$.
 \end{definition}
 
-\begin{listing}
-	\begin{minted}{idris}
-		data M : (0 n : Nat) -> (t : Type) -> Type where
-			MS : (1 x : t) -> (1 xs : (Lazy (M n t))) -> M (S n) t
-			MZ : M Z t
-	\end{minted}
-	\caption{Idris definition of $M$}
-\end{listing}
-Note that $M$ is \emph{not} a special construction.
-It is an ordinary type, with ordinary constructors, that is \emph{already} valid Idris.
-This is one of the primary utilities of $M$: it allows us to construct equivalent constructions to those in GrTT in QTT without extending QTT itself.
+Note that \gls{type:source} does not take a \gls{type:tpe} as an\footnote{explicit} arguement, but rather an \emph{element} of that type, $x$. 
+Also note that by the rules of \gls{type:nats}, for a given $n$, there is \emph{only} one valid constructor \footnote{Specifically Peano's 8th Axiom} \needcite.
 
-Also note that $M_n t$ is very different then $!_n t$. 
-$M_n t$ requires \emph{exactly} $n$ usages of $t$, while $!_n t$ requires \emph{at most} $n$ usages of $t$. \cite{linear_exponent}
+This will become incredibly useful, as we prove other facts about \gls{type:source}.
 
-\subsection{Operators of $M$}
+\begin{lemma}[Uniqueness of \gls{type:source}]
+	\label{lem:unique}
+	If $\Delta_0$ and $\Delta_1$ both have type $\gls{type:source} \ n \ x$, and that type is constructible, then $\Delta_0 \gls{sym:peq} \Delta_1$
+\end{lemma}
 
-There are four main operators relating to $M$, $\mcombine$\footnote{Written $\texttt{combine}$}, and \verb|join|, as well as their inverses, \verb|split| and \verb|expand|.
+\begin{proof}
+	Let us induce on $n$.
+	
+	The base case $n \equiv 0$, thereby $\Delta_0$ and $\Delta_1$ are of type $\gls{type:source} \ 0 \ x$, which has only one constructor, $\mz$, which is equal to itself.
+	
+	The inductive case, then involves a proof that $a \nsum \Delta_0' \gls{sym:peq} b \nsum \Delta_1'$, where $\Delta_0' : \gls{type:source} \ n \ x$, $\Delta_1' : \gls{type:source} \ n \ x$.
+	
+	We note the type of $\nsum : (x : t) \proc \gls{type:source} \ n \ x \proc \gls{type:source} \ (S n) \ x$, and attempt to unify $\Delta_0' : \gls{type:source} \ n \ x$ with $\gls{type:source} \ n \ x$, and then infer the first argument must be of the form $x$.
+	Thereby, $a \gls{sym:peq} x$.
+	
+	Do similar on $b$ and $\Delta_1'$, and we also get $b \gls{sym:peq} x$. 
+	We then rewrite, using both these two results $x \nsum \Delta_0' \gls{sym:peq} x \nsum \Delta_1'$, then, we have $\Delta_0' \gls{sym:peq} \Delta_1'$.
+	This is the induction hypothesis.
+\end{proof}
 
-The first of these, $\mcombine$, acts as a way to "combine" two different sets of bindings into one larger set (in \verb|Data.Linear.Copies|, it is called \verb|++|) \cite{inverse_of_type,idris_linear}.
-Its type signature is $\mcombine : M_a t \proc M_b t \proc M_{a+b} t$.
-Notably when written using exponential notation, its signature becomes $\mcombine : t^a \proc t^b \proc t^{a+b}$, which looks like the multiplication of exponential. 
-Its Idris implementation may be found at \ref{combine_code}
+\subsection{Witnessing Supplies}
 
-Indeed, if we view $M_n t$ as an $n$-tuple of $t$ containing all identical elements, there is a direct relationship between the constructors and the numbers.
-\begin{tabular}{|c|c|c|}
-	\hline
-	Exponent & Number & M \\
-	\hline
-	\hline
-	$t^0$ & $1$ & $\mz$ \\
-	\hline
-	$t^1$ & $1*t$ & $\mz \nsum t$ \\
-	\hline
-	$t^2$ & $1*t*t$ & $\mz \nsum t \nsum t $ \\
-	\hline
-	$t^3$ & $1*t*t*t$ & $\mz \nsum t \nsum t \nsum t $ \\
-	\hline
-\end{tabular}
+While this would be quite useful for determining general copies of specific values, this isn't what we desire.
+Rather, we want to model the notion of a graded modality in Idris.
+For this, we need a way to ask for $n$-copies of a given type.
 
-Under this view, $\mcombine$ is the quantitative interpretation of multiplication.
-That is, $x \mcombine y = z$ where $x$ is (a) $t^3$, $y$ is (a) $t^2$, and $z$ is (a) $t^5$ is both correct quantitatively and numerically.
-More information on the relationship between copies and exponents may be found in \citetitle{inverse_of_type}.
+For this, we define another type $M$, which captures the notion of a generalized modality on types.
 
-In this case \verb|split| acts as "division". 
-Namely, it has the form $\verb|split| : t^{a+b} \proc (t^a \lpair t^b)$.
+\begin{definition}
+	$\tmu$ is a type indexed on a $\nat$ and $\gls{type:tpe}$. 
+	It has one constructor, $S : (w :_0 t) \to \gls{type:source} \ n \ w \proc \tmu \ n \ t$.
+	We refer to the erased $t$, $w$, as the witness.
+\end{definition}
 
-\verb|join| simplifies "repeat exponentiation". 
-Namely, it has the signature $\verb|join| : {t^a}^b \proc t^{a*b}$, which also has the inverse of \verb|expand|, which itself has the signature $\verb|expand| : t^{a*b} \proc {t^a}^b$.
-
-\subsection{Application of $M$}
-
-In discussions of graded types, two procedures are often mentioned, \verb|push| and \verb|pull|.
-$M$ has equivalents of these, $\texttt{push} : (a \lpair b)^n \proc (a^n \lpair b^n)$ and $\texttt{pull} : (a^n \lpair b^n) \proc (a \lpair b)^n$ \cite{quant_graded_modal}. 
-These are enough to define application of $M$ types.
-
-Specifically, we can define $\verb|apM| : (a \proc b)^n \proc a^n \proc b^n$.
-To construct $\verb|apM| f x$ we fist $\verb|pull|$ both of these into a single pair, thereby getting something of the form $\verb|apps| : ((a \proc b) \lpair a)^n$. 
-We then simply apply each pair, and get $b^n$.
-
-There is a way to further generalize this application, however. 
-Namely, given a $f : (t_0 \proc t_1)^{a+b}$, and $x : {t_0}^{a+c}$, we have $(t_1^a \lpair (t_0 \proc t_1)^b \lpair t_1^c)$.
-We construct this by splitting $f$ and $x$, and then applying the relevant section, returning the "unused" portions themselves.
+$M$ serves to "wrap around" a given \gls{type:source} by abstracting over the specific value, $w$.en

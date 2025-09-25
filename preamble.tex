@@ -6,6 +6,7 @@
 \usepackage{biblatex}
 \usepackage{amsmath}
 \usepackage{fancyvrb}
+
 \usepackage{amssymb}
 % \usepackage[utf8]{inputenc}
 % \usepackage{easyReview}
@@ -15,7 +16,9 @@
 \usepackage{microtype}
 \usepackage{tikz}
 \usepackage{tikz-cd}
-% \usetikzlibrary{}
+\usepackage{glossaries-extra}
+
+\usetikzlibrary{decorations.pathmorphing}
 \addbibresource{bibliography.bib}
 
 
@@ -37,23 +40,34 @@
 \newtheorem{notation}[theorem]{Notation}
 \newtheorem{note}[theorem]{Notation}
 
-\newcommand{\proc}{\ensuremath{\multimap}}
-\newcommand{\tmu}{\ensuremath{M}}
-\newcommand{\tomega}{\ensuremath{\Omega}}
-\newcommand{\nsum}{\ensuremath{\otimes}}
-\newcommand{\mcombine}{\ensuremath{\odot}}
-\newcommand{\nat}{\ensuremath{\mathbb{N}}}
-\newcommand{\tpe}{\ensuremath{\ast}}
-\newcommand{\tset}{\ensuremath{\text{Part}}}
-\newcommand{\redux}{\ensuremath{\vartriangleright}}
-\newcommand{\mz}{\ensuremath{\diamond}}
-\newcommand{\liso}{\ensuremath{\cong_1}}
-\newcommand{\nuse}[2]{\ensuremath{{#1}\#{#2}}}
-\newcommand{\lpair}{\ensuremath{\times^1}}
-\newcommand{\liniso}{\ensuremath{\cong_{\multimap}}}
+
+
+\def\needcite{{\todo{Need citation}}}
 \hypersetup{
 	colorlinks   = true, %Colours links instead of ugly boxes
 	urlcolor     = blue, %Colour for external hyperlinks
 	linkcolor    = black, %Colour of internal links
 	citecolor   = black %Colour of citations
 }
+
+\loadglsentries{gloss}
+\makeglossaries
+\newcommand{\proc}{\ensuremath{\gls{sym:lmap}}}
+\newcommand{\mz}{\gls{cons:exhaust}}
+\newcommand{\nsum}{\gls{cons:provide}}
+\newcommand{\tmu}{\ensuremath{M}}
+\newcommand{\tomega}{\ensuremath{\Omega}}
+
+\newcommand{\mcombine}{\ensuremath{\odot}}
+\newcommand{\nat}{\gls{type:nats}}
+\newcommand{\tpe}{\gls{type:tpe}}
+\newcommand{\tset}{\ensuremath{\text{Part}}}
+\newcommand{\redux}{\ensuremath{\vartriangleright}}
+
+\newcommand{\liso}{\ensuremath{\cong_1}}
+\newcommand{\nuse}[2]{\ensuremath{{#1}\#{#2}}}
+\newcommand{\lpair}{\ensuremath{\times^1}}
+\newcommand{\liniso}{\ensuremath{\cong_{\multimap}}}
+
+
+
