@@ -328,3 +328,5 @@ TSWLatexianTemp*
 _minted
 
 *.pdf
+
+!main.pdf

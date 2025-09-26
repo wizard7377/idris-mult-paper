@@ -6,6 +6,12 @@
 	name={\ensuremath{\mathcal{L}}},
 	description={The category of linear values}
 }
+
+\newglossaryentry{sym:lmap}{
+	name={\ensuremath{\multimap}},
+	description={The linear mapping, written in Idris as \texttt{-@}},
+	parent={sym:lin}
+}
 \newglossaryentry{type:nats}{
 	name={\ensuremath{\mathbb{N}}},
 	sort={Natural Numbers},
@@ -22,18 +28,42 @@
 	description={Source of copies}
 }
 
-\newglossaryentry{sym:lmap}{
-	name={\ensuremath{\multimap}},
-	description={The linear mapping, written in Idris as \texttt{-@}}
+\newglossaryentry{type:tmu}{
+	name={\ensuremath{M}},
+	sort={Mu type},
+	description={The Mu (M) type, which is a certain number of copies of a type, combined with a witness for that, that is used to model multiplicities}
 }
+
+\newglossaryentry{type:omegaId}{
+	name={\ensuremath{\omega}},
+	sort={Omega identity type},
+	description={$\omega$ models }
+}
+\newglossaryentry{type:Omega}{
+	name={\ensuremath{\Omega}},
+	sort={Mu type},
+	description={The Omega $\Omega$ type, which is a certain number of copies of a type, combined with a witness for that, that is used to model multiplicities}
+}
+
 
 \newglossaryentry{sym:peq}{
 	name={\ensuremath{=_?}},
 	description={Propositional (type-level) equality}
 }
-
+\newglossaryentry{sym:forall}{
+	name={\ensuremath{\forall}},
+	description={
+		Erased function, or equivalently universal quantitfication, ($\forall_a b c$ is equivalent to $b :_0 a \to c$)
+	}
+}
+\newglossaryentry{sym:exists1}{
+	name={\ensuremath{\exists^1}},
+	description={
+		The erased-linear dependent pair, i.e, the erased dependent pair type where the second element is linear. Written in Idris as a record \texttt{LExists}.
+	}
+}
 \newglossaryentry{cons:provide}{
-	name={\ensuremath{\otimes}},
+	name={\ensuremath{\odot}},
 	description={Provide a single instance for the copy}
 }
 
@@ -42,5 +72,19 @@
 	description={All copies have been exhausted}
 }
 
+\newglossaryentry{lib:prelude}{
+	name={\texttt{prelude}},
+	description={The Idris 2 Prelude\cite{idris_prelude}}
+}
+
+\newglossaryentry{lib:base}{
+	name={\texttt{base}},
+	description={The Idris 2 base library\cite{idris_base}}
+}
+
+\newglossaryentry{lib:linear}{
+	name={\texttt{linear}},
+	description={The Idris 2 linear library\cite{idris_linear}}
+}
 
 

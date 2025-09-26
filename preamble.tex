@@ -54,20 +54,24 @@
 \makeglossaries
 \newcommand{\proc}{\ensuremath{\gls{sym:lmap}}}
 \newcommand{\mz}{\gls{cons:exhaust}}
+\newcommand{\ms}{\gls{cons:provide}}
 \newcommand{\nsum}{\gls{cons:provide}}
-\newcommand{\tmu}{\ensuremath{M}}
-\newcommand{\tomega}{\ensuremath{\Omega}}
+\newcommand{\tmu}{\gls{type:tmu}}
+\newcommand{\tomega}{\gls{type:Omega}}
 
-\newcommand{\mcombine}{\ensuremath{\odot}}
+\newcommand{\mcombine}{\ensuremath{\otimes}} %TODO: Link to gloss
 \newcommand{\nat}{\gls{type:nats}}
 \newcommand{\tpe}{\gls{type:tpe}}
 \newcommand{\tset}{\ensuremath{\text{Part}}}
 \newcommand{\redux}{\ensuremath{\vartriangleright}}
-
+\newcommand{\fa}[1]{{\gls{sym:forall}}_{#1}}
 \newcommand{\liso}{\ensuremath{\cong_1}}
 \newcommand{\nuse}[2]{\ensuremath{{#1}\#{#2}}}
-\newcommand{\lpair}{\ensuremath{\times^1}}
+\newcommand{\lpair}{\ensuremath{\times^1}} %TODO: Link to gloss
+\newcommand{\ltup}{\ensuremath{*^1}} %TODO: Link to gloss
 \newcommand{\liniso}{\ensuremath{\cong_{\multimap}}}
-
-
+\newcommand{\carat}{\ensuremath{\wedge}} %TODO: Find a less stupid way to do this
+%\newenvironment{idris}[2][]{%
+%	\begin{listing} \ifblank{#1}{}{\label{#1}} \ifblank{#2}{}{\caption{#2}} \VerbatimEnvironment\begin{minted}{idris} } 
+% { \end{minted} \end{listing} }
 
