@@ -1,24 +1,25 @@
 % !TeX TS-program = pdflatex
 
 
-\documentclass{article}
-
+%\documentclass[natbib=false,acmsmall]{acmart}
+\documentclass[authordraft=true,review=true,nonacm=true,natbib=false,acmsmall]{acmart}
 \input{preamble.tex}
 
 \begin{document}
 \setminted{autogobble=true, breaklines}
-\title{$\mu$ Types for a Multitude of Multiplicities}
+\title{Graded Modalities as Linear Types}
 \author{Asher Frost}
+\orcid{0009-0000-1043-4054}
 \date{\today}
-\maketitle	
 	
 \begin{abstract}
-	Idris2 uses Quantitative Type Theory (QTT) in a way that is quite practical and elegant.
-	Described here is a way to model $\omega$ types using only linear ones, while obtaining multiplicity polymorphism, without extending the core language.
+	We present an approach that models graded modal bindings using only linear ones.
+	Inspired by Granule, we present an approach in Idris 2 to model limited grades using a construction, called "mu" ($M$).
+	We present the construction of $M$, related ones, operations on them, and some useful properties
 \end{abstract}	
-
+\maketitle	
 \listoftodos
-\tableofcontents
+%\tableofcontents
 
 \input{body.tex}
 \printbibliography

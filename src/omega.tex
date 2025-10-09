@@ -1,20 +1,2 @@
 \section{$\omega$ and $\tomega$ Types}
 
-While all this is useful, we still need to be able to incorperate the idea of "unrestricted" bindings into our set of constructs.
-This is the goal of the $\omega$ and $\Omega$ constructions, to provide model for almost all multiplicities, without extending the core language.
-
-\subsection{$\omega$}
-
-The $\omega$ construction is quite simple.
-It takes advantage of the fact that there isn't a distinction between a value and a way to generate it.
-So, we don't need an actual variable number of bindings, we merely need a way to generate for any $n$ some $n$ bindings. 
-This is all $\omega$ is, a continuation on the number of bindings.
-
-So, $\omega t w \equiv ((n : \nat) \to M n t w)$ \todo{add more info on this}
-\subsection{$\omega$ as $!_*$}
-
-\subsection{$\Omega$ as a generalization of $\omega$}
-
-\subsection{$\tomega$ as a generalization of $M$}
-
-\subsection{$M$ to $\tomega$}

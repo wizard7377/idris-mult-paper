@@ -2,25 +2,36 @@
 \newacronym{qtt}{QTT}{Quantative Type Theory}
 \newacronym{grtt}{GrTT}{Graded Modal Type Theory}
 
-\newglossaryentry{sym:lin}{
+\longnewglossaryentry{sym:lin}{
 	name={\ensuremath{\mathcal{L}}},
-	description={The category of linear values}
+	description={%
+		The linear category.
+		Objects are Idris 2 types.
+		Morphisms are linear functions
+	},
+	see={sym:lmap}
+	,
+	category={symbol}
 }
 
 \newglossaryentry{sym:lmap}{
-	name={\ensuremath{\multimap}},
-	description={The linear mapping, written in Idris as \texttt{-@}},
-	parent={sym:lin}
+	name={\ensuremath{\to_1}},
+	description={The linear mapping, $(x : A) \to_1 B$ is written in Idris as \texttt{(1 x : A) -> B}. This is also the form of morphisms in $\mathcal{L}$},
+	see={sym:lin},
+	parent={sym:lin},
+	category={symbol}
 }
 \newglossaryentry{type:nats}{
 	name={\ensuremath{\mathbb{N}}},
 	sort={Natural Numbers},
-	description={The set of all natural numbers}
+	description={The set of all natural numbers},
+	category={types}
 }
 \newglossaryentry{type:tpe}{
 	name={\ensuremath{\ast}},
 	sort={Type},
-	description={The type of all types, also called \texttt{Set}, $\mathcal{U}$, or $\mathcal{U}^\infty$}
+	description={The type of all types, also called \texttt{Set}, $\mathcal{U}$, or $\mathcal{U}^\infty$},
+	category={types}
 }
 \newglossaryentry{type:source}{
 	name={\texttt{Source}},
@@ -42,25 +53,45 @@
 \newglossaryentry{type:Omega}{
 	name={\ensuremath{\Omega}},
 	sort={Mu type},
-	description={The Omega $\Omega$ type, which is a certain number of copies of a type, combined with a witness for that, that is used to model multiplicities}
+	description={The Omega $\Omega$ type, which is a certain number of copies of a type, combined with a witness for that, that is used to model multiplicities},
+	category={types}
 }
-
-
+\newglossaryentry{type:OmegaPart}{
+	name={\ensuremath{\Omega_\texttt{Part}}},
+	description={},
+	category={types},
+	parent={type:Omega}
+}
+\newglossaryentry{type:OmegaProj}{
+	name={\ensuremath{\Omega_\texttt{Proj}}},
+	description={},
+	category={types},
+	parent={type:Omega}
+}
 \newglossaryentry{sym:peq}{
 	name={\ensuremath{=_?}},
-	description={Propositional (type-level) equality}
+	description={Propositional (type-level) equality},
+	category={symbol}
+}
+\newglossaryentry{sym:efun}{
+	name={\ensuremath{\to_0}},
+	description={
+		Erased function, or universeal explicit quantification. $(x : A) \to_0 B$ is written in Idris as \texttt{(0 x : A) -> B}.
+	}
 }
 \newglossaryentry{sym:forall}{
 	name={\ensuremath{\forall}},
 	description={
-		Erased function, or equivalently universal quantitfication, ($\forall_a b c$ is equivalent to $b :_0 a \to c$)
-	}
+		Implicit erased function, or universal quantification. $\forall_A x . B$ is written in Idris as\footnote{Idris 2 actually has a construct called \texttt{forall}, however, we distinguish this because of explicitly writing the type} \texttt{\{0 x : A\} -> b}
+	},
+	category={symbol}
 }
 \newglossaryentry{sym:exists1}{
 	name={\ensuremath{\exists^1}},
 	description={
 		The erased-linear dependent pair, i.e, the erased dependent pair type where the second element is linear. Written in Idris as a record \texttt{LExists}.
-	}
+	},
+	category={symbol}
 }
 \newglossaryentry{cons:provide}{
 	name={\ensuremath{\odot}},
@@ -74,17 +105,26 @@
 
 \newglossaryentry{lib:prelude}{
 	name={\texttt{prelude}},
-	description={The Idris 2 Prelude\cite{idris_prelude}}
+	description={The Idris 2 Prelude\cite{idris_prelude}},
+	category={library}
 }
 
 \newglossaryentry{lib:base}{
 	name={\texttt{base}},
-	description={The Idris 2 base library\cite{idris_base}}
+	description={The Idris 2 base library\cite{idris_base}},
+	category={library}
 }
 
 \newglossaryentry{lib:linear}{
 	name={\texttt{linear}},
-	description={The Idris 2 linear library\cite{idris_linear}}
+	description={The Idris 2 linear library\cite{idris_linear}},
+	category={library}
+}
+
+\newglossaryentry{type:lin_unr}{
+	name={\ensuremath{!_*}},
+	description={A unrestricted value with linear binding},
+	category={types}
 }
 
 

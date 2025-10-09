@@ -1,177 +1,182 @@
 \section{$\tmu$ types}
 
-\tmu types aim to serve as a model for multiplicity polymorphism, without extending the core language of Idris.
-Moreover, a construction on \tmu, \tomega, can be used to model a form of unrestricted binding.
-The \tmu type is indexed on three arguments, a "size", $n : \nat$, a type $t : \tpe$, and a witness of that type, $w : t$ 
+The core construction here is $M$, or, in Idris, \ident Mu , type.
+This is made to model a "source" of a given value.
+It is indexed by a natural number, a type, and an erased value of that type. 
+The definitions of this in Idris are given at \ref{lst:mu_def}
 
 \begin{definition}
-	The definition of \tmu and its constructors are:
-	
-	\begin{math}
-		\tmu : (n :_0 \nat) \to (t :_0 \tpe) \to (w :_0 t) \to \tpe \\
-		\mz : \fa{\tpe} t \fa{t} w (\tmu \ 0 \ t \ w) \\
-		\ms : \fa{\tpe} t \fa{\nat} n ((w : t) \proc (\tmu \ n \ t \ w) \proc (\tmu \ (S \ n) \ t \ w))
-	\end{math}
+	$M$ is a polymorphic type with signature 
+	$M : \fn0 n : \nat . \fn0 t : \tpe . \fn0 w : t . \tpe$
 \end{definition}
 
-\begin{figure}[h]
+In addition, $M$ has two constructors
+
+\begin{definition}
+	There are two constructors of $M$, $\mz$ \ident MZ , and $\odot$, \ident MS , Which have the singatures $\mz : \tm n t w$ and $\ms : \fn1 w : t . \fn1 \_ : {\tm n t w} . \tm {(S n)} t w$ 
+\end{definition}
+
+Firstly, it should be noted taht the names were chose due to tthe fact that the indices of them are related. 
+That is, $\mz$  or "mu zero" will always be indexed by $0$, and $\ms$, "mu successor", is always indexed by the succesor of whatever is given in.
+
+\begin{listing}
 	\begin{minted}{idris}
-		data M : (n : Nat) -> (t : Type) -> {w : t} -> Type where
+		data Mu : (n : Nat) -> (t : Type) -> (w : t) -> Type where
 			MZ : 
-				{0 t : Type} ->
-				{0 w : t} ->
-				M Z t {w}
+				Mu Z t w
 			MS : 
-				{0 t : Type} -> 
-				{0 n : Nat} -> 
-				{0 w : t} ->
 				(1 w : t) -> 
-				(1 xs : Lazy (M n t {w})) -> 
-				M (S n) t {w}
+				(1 xs : (Mu n t w)) -> 
+				Mu (S n) t w
 	\end{minted}
-	\caption{Idris definition of \tmu, as found in \texttt{Data.Mu.Types}}
+	\caption{The definition of $M$ in Idris}
+	\label{lst:mu_def}
+\end{listing}
+\begin{remark}
+	\label{remark:only_zero}
+	$\tm 0 t w$ can only be constructed by $\mz$.
+\end{remark}
+Intuitivly, $M$ represents $n$ copies of $t$, all with the value $w$, very much inspired by the paper \citetitle{inverse_of_type}.
+For instance, if we want to construct $x : \tm 2 {\ident String } \verb|"value"|$, we can only construct this thorugh \ms, an we know, bu nothing but the first arguement of the value, that we must take as a initial arguement $\verb|value|$, and as a second value of the form $\tm 1 \ident String \verb|"value"|$, which we then repeat one more time and get another \verb|"value"| an finally we match $\tm 0 {\ident String } \verb|"value"|$ and get that we must have $\mz$. 
+We can then say that we kneow that the only constructors of $\tm 2 {\ident String } \verb|"String"|$ is $\verb|"value"| \ms \verb|"value"| \ms \mz$. Note the similarity between the natural number and the constructors. 
+Just as we get 2 by applying \ident S twice to \ident Z , we get $\tm 2 {\ident String } \verb|"value"|$ by applying $\ms$ twice to $\mz$. 
+This relationship betweeen $M$ types and numbers is far more extensive, as we will cover later 
+
+The \ident w index or "witness" is the value being copied.
+Notably, if we remove the \ident w index, we would have $\mz : M n t$, and $\ms : t \to_1 M n t \to_1 M (S n) t$, which is simply \ident LVect. 
+The reason that this is undesirable is that we don't want this as it allows for $M$ to have hetrogeneous elements. 
+However, if we are talking about "copies" of something, we know that should all be the exact same.
+
+There are two very basic functions that bear mention with respect to $M$. The first of these is \ident witness , which is of the form $\ident witness :_0 \fa0 w : t . \tm n t w \to t$.
+Note that this is an \emph{erased} function.
+Its implementation is quite simple, just being $\ident witness \{w\} \_ \deq w$, which we can create, as erased functions can return erased values \needcite.
+In addition, we also have $\ident drop : \fn1 \_ : {\tm 0 t w} . ()$, which allows us to drop a value.
+Its signature is simple $\ident drop \mz \deq ()$.
+
+Finally, we have \ident once , which takes a value of form $M 1$ and extracts it into the value itself.
+It has a signature $\ident once : \fn1 \_ : \tm 1 t w . t$, where we have $\ident once (x \ms \mz) \deq x$
+
+\subsection{Uniqueness}
+
+While \ident w serves a greatj purpose in the interpretation of $M$ it perhasp serves an even greater purpose in terms of values of $M$.
+We can, using \sigil w, provate that there exists exactly one inhabitatent of the type $\tm n t w$, so long as that type is well formed.
+
+\todo{Segway into proof}
+
+\begin{lemma}
+	$x : \tm n t w$ only if the concrete value of $x$ contains $n$ applicationso f $\ms$.
+\end{lemma}
+\begin{proof}
+	Induct on \sigil n, the first case, $\tm 0 t w$, contains zero applications of \ms, as it is \mz.
+	The second one splits has $x : M (S n') t w$, and we can destruct on the only possible constructor of $M$ for $S$, $\ms$, and get $y :_1 t$ and $z :_1 M n t w$ where $x \peq (y \ms z)$. 
+	We know by the induction hypothesis that $z$ contains exactly $n'$ uses of $\ms$, and we therefore know that the constructor occurs one more times then that, or $S n'$
+\end{proof}
+
+This codifies the relationship between $M$ types and natural numbers.
+Next we prove that we can establish equality between any two elements of a given $M$ instance.
+This is equivalent to the statement "there exists at most one $M$" \needcite.
+
+\begin{lemma}
+	\label{lem:all_eq}
+	If both $x$ and $y$ are of type $\tm n t w$, then $x \peq y$.
+\end{lemma}
+\begin{proof}
+	Induct on $n$.
+	\begin{itemize}
+		\item The first case, where \sigil x and \sigil y are both $\tm 0 t w$, is trivial because, as per \ref{remark:only_zero} they both must be $\mz$
+		\item The inductive case, where, from the fact that for any $a$ and $b$ (both of $\tm n' t w$) we have $a \peq b$, we prove that we have, for \sigil x and \sigil y of $\tm {(S n')} t w$ that $x \peq y$.
+		We note that we can destruct both of these, with $x_1 : \tm n' t w$ and $y_1 : \tm n' t w$, into $x = x_0 \ms x_1$ and $y = y_0 \ms y_1$, where we note that both $x_0$ and $y_0$ must be equal to \sigil w, and then we just have the induction hypthesis, $x_1 \peq y_1$
+	\end{itemize}
+	
+	We thereby can simply this to the fact that $\tm n' t w$ has the above property, which is the induction hypothesis.
+\end{proof}
+
+\todo[cleanup]{Finish proof}
+
+However, we can make a even more specific statement, given the fact we know that $w$ is an inhabitent of $t$.
+\begin{theorem}[Uniqueness]
+	\label{thm:unique}
+	If $\tm n t w$ is well formed, then it must have \emph{exactly} one inhabitent.
+\end{theorem}
+\begin{proof}
+	We know by \ref{lem:all_eq} that there is \emph{at most} one inhabitent of $\tm n t w$. 
+	We then induct on $n$ to show that there must also exist \emph{at least} one inhabitent of the type.
+	\begin{itemize}
+		\item The first case is that $\tm 0 t w$ is always constructible, which is trivial, as this is just $\mz$.
+		\item The second case, that $\tm n' t w$ provides $\tm {(S n')} t w$ being constructible is also trivial, namely, if we have the construction on $\tm n' t w$ as $x$, we \emph{know} that the provided value must be \sigil w.
+	\end{itemize}
+	
+	Given that we can prove that there must be at least and at most one inhabitent, we can prove that there is exactly one inhabitent.
+\end{proof}
+
+This is very important for proofs on $M$.
+It corresponds to the fact that there is only one way to copy something, to provide another value that is the exact same as the first.
+
+\subsection{Graded Modalities With $M$}
+\label{sec:grade_mu}
+A claim was made earlier that $M$ types can be used to model graded modalities within QTT.
+The way it does this, however, is not by directly equating $M$ types with $[]$ types \cite{quant_graded_modal}.
+It instead does this in a similar way to how others have embedded QTT in Agda \cite{lin_dyn_mult_dep,dep_mult_dep_lin}. 
+
+Namely, rather than viewing $\tm n t w$ as the \emph{type} $[t]_n$, we instead view it as the \emph{judgment} $[w] : [t]_r$.
+Fortunately, due to the fact that this is Idris 2, we don't need a separate $\Vdash$, as $M$ is a type, which, like any other, can be bound linearly, so, the equivalent to the GrTT statement $\Gamma \vdash [x] : [a]_r$ is $\Gamma \vdash \phi : \tm r a x$, which can be manipulated like any other type.
+
+This is incredibly powerful.
+Not only can we reason about graded modalities in Idris, we can reason about them in the language itself, rather than as part of the syntax, which allows us to employ regular proofs on them.
+This is very apparent in the way constructions are devised. 
+For instance, while Granule requires separate rules for dereliction, we do not, and per as a matter of fact we just define it as \ident once ; a similar relationship exists between weakening and \ident drop . 
+
+\begin{remark}
+	\label{remark:mu_grade_eq}
+	We assume that $M n t w$ is equivalent to $[w] : [t]_n$.
+\end{remark}
+
+Unfortunately, there is no way to prove this in either language, as $M$ can't be constructed in Granule, and graded modal types don't exist in Idris 2.
+ 
+\subsection{Operations on $M$}
+
+There are number of operations that are very important on $M$.
+The first of these that we will discuss is combination.
+We define this as $\mcombine : \fn1 \_ : {\tm m t w} . \fn1 \_ : {\tm n t w} . \tm {(m + n)} t w$\missingcode, and we define it inductivly as $\ms \mcombine x \deq x$, and $(a \ms b) \mcombine x \deq a \ms (b \mcombine x)$.
+Note the similarity between the natural number indicies and the values, where $0 + x \deq x$ and $(S n) + x \deq S (n + x)$
+
+\todo[cleanup]{Fix the alignement of these}
+\begin{figure}
+	\begin{align}
+		\mz \mcombine &x &\deq x \\
+		Z + 	  &x &\deq x
+	\end{align}
+	\begin{align}
+		(a \ms &b) \mcombine &x \deq a \ms &(b &\mcombine x) \\
+		(S &n) + &x \deq S &(n &+ x)
+	\end{align}
 \end{figure}
 
-\subsection{The Uniqueness Theorem}
-
-\begin{theorem}[Uniqueness of \tmu]
-	\label{lem:unique}
-	If $\Delta_0$ and $\Delta_1$ both have type $\tmu \ n \ t \ w$, and that type is constructible, then $\Delta_0 \gls{sym:peq} \Delta_1$
-\end{theorem}
-
-\begin{proof}
-	Let us induce on $n$.
-	
-	The base case $n \equiv 0$, thereby $\Delta_0$ and $\Delta_1$ are of type $\tmu \ 0 \ t \ w$, which has only one constructor, $\mz$, which is equal to itself.
-	
-	The inductive case, then involves a proof that $a \nsum \Delta_0' \gls{sym:peq} b \nsum \Delta_1'$, where $\Delta_0' : \tmu \ n \ t \ w$, $\Delta_1' : \tmu \ n \ t \ w$.
-	
-	We note the type of $\nsum : (w : t) \proc \tmu \ n \ t \ w \proc \tmu \ (S n) \ t \ w$, and attempt to unify $\Delta_0' : \tmu \ n \ t \ w$ with $\tmu \ n \ t \ w$, and then infer the first argument must be of the form $w$.
-	Thereby, $a \gls{sym:peq} w$.
-	
-	Do similar on $b$ and $\Delta_1'$, and we also get $b \gls{sym:peq} w$. 
-	We then rewrite, using both these two results $w \nsum \Delta_0' \gls{sym:peq} w \nsum \Delta_1'$, then, we have $\Delta_0' \gls{sym:peq} \Delta_1'$.
-	This is the induction hypothesis.
-\end{proof}
-
-That is, given the fact that $ \tmu \ n \ t \ w$ is constructable, there must be exactly one inhabitant.
-
-We can establish a number of interesting corollaries, including that products are unique:
-
-\begin{corollary}
-	If $\Delta_0$ and $\Delta_1$ both have type $(\tmu \ m \ t \ w_0 \lpair \tmu \ n \ u \ w_1)$, and that type is constructible, then $\Delta_0 \gls{sym:peq} \Delta_1$
-\end{corollary}
-
-\begin{proof}
-	\todo{Add proof}
-\end{proof}
-
-\subsection{Pushing and Pulling}
-
-\label{sec:push_pull}
-
-
-Of course, at this point, we still can do almost nothing with the \tmu type.
-To use it, we will need to define functions to help with its usages, we will start with the \verb|push| and \verb|pull| functions \cite{quant_graded_modal}.
-Specifically, we want two functions, $\verb|pushM| : ( \tmu \ n \ (t \lpair u) \ (w_0 \ltup w_1)) \proc (( \tmu \ n \ t \ w_0) \lpair ( \tmu \ n \ u \ w_1))$, and $\verb|pullM| : (( \tmu \ n \ t \ w_0) \lpair ( \tmu \ n \ u \ w_1)) \proc ( \tmu \ n \ (t \lpair u) \ (w_0 \ltup w_1))$.
-For the ease of understanding, in Granule syntax, these are \verb|(a, b) [c] → (a [c], b [c])| (for \verb|push|) and \verb|(a [c], b [c]) → (a, b) [c]| (for \verb|pull|) \cite{quant_graded_modal}.
-Essentially, these two functions allow us to "distribute" a modality over a linear pair, or invert this "distribution". 
-
-The definitions (in Idris) are as follows 
-\begin{minted}{idris}
-	pushM MZ = MZ # MZ
-	pushM (MS (x # y) z) = 
-		let (xs # ys) = pushM z 
-		in (MS x {w=x} xs # MS y {w=y} ys)
-\end{minted}
-
-and 
-
-\begin{minted}{idris}
-	pullM (MZ # MZ) = MZ
-	pullM (MS x xs # MS y ys) = 
-		MS (x # y) {w=(x # y)} (pullM (xs # ys))
-\end{minted}
-
-Note the simultaneous mapping of the values at runtime and the witnesses at type-level, in addition, note that we manipulate the witnesses like what they represent at runtime.
-
-Naturally, these should form an isomorphism.
+In addition, using the assumption of \ref{remark:mu_grade_eq}, we can liken the function $\mcombine$ to context concatenation \cite{quant_graded_modal}.
+However, unlike Granule, we define this in the language itself.
+Per as a matter of fact, it isn't actually possible to construct \mcombine in Granule, as it would require a way to reason about type level equality, which isn't possible.
 
 \begin{lemma}
-	\verb|pushM| and \verb|pullM|, form a linear isomorphism between $(\tmu \ n \ (t \lpair u) \ (w_0 \ltup w_1))$ and $((\tmu \ n \ t \ w_0) \lpair (\tmu \ n \ u \ w_1))$
+	\label{lem:combine_comm}
+	$\mcombine$ is commutative\footnote{You can also prove associativity and related properties, the proof is the same}, that is, $x \mcombine y \peq y \mcombine x$.
 \end{lemma}
-
 \begin{proof}
-	It is trivial that the types are indeed those of their respective functions.
-	Then, because the argument type of \verb|pushM| is the result type of \verb|pullM|, and vice versa, we can use \ref{lem:unique} to determine that this must map to and from the same object (there is only one possible)
+	These types are the same, and by \ref{thm:unique}, they are equal.
 \end{proof}
 
-\subsection{Mapping Linearly}
+Given that we can "add" (Or, as we will see later, multiply) two $M$, it would seem natural that we could also subtract them.
+We can this function, which is the inverse of \ident combine , \ident split , which has the signature $\ident split : \fn1 n : \nat . \fn1 - : {\tm {(m + n)} t w} . {{\tm m t w} \lpair {\tm n t w}}$.
+We actually use this a fair bit more than we use \ident combine , as \ident split doesn't impose any restrictions on the witness, which is very useful for when we discuss \carat types.
 
-\label{sec:map_lin}
-
-Next, we define a way to define a \verb|Functor| like \verb|map| on $\tmu$, namely, $\verb|mapM| : (f : t \proc u) \to M \ n \ t \ w \proc M \ n \ u \ (f \ w)$
-
-\todo{Idris definition}
-
-\subsubsection{Applying $M$ to $M$}
-
-\label{sec:app_m_to_m}
-
-Now, for the ability to apply $M$ types.
-Firstly, note that in general, in both \gls{qtt} and \gls{grtt}, we need to have an equal number of functions and arguments \cite{eb_idris_qtt_prac, quant_graded_modal}
-We can construct a function $\verb|applyLinear| : (a \proc b) \proc a \proc b$, whose term is just $\verb|applyLinear| f x \equiv f x$.
-We can then curry \todo{Cite and maybe linear currying?} this function, getting $\verb|applyPair| : ((a \proc b) \lpair a) \proc b$.
-
-In addition two values $x : M n (t \proc u) f$ and $y : M n t w$, we can then construct the linear pair, $(x *^1 y) : M n (t \proc u) f \lpair M n t w$. We can then apply $\verb|pullM|$ to the pair, thereby getting a value of the form $z : M n (t \proc u \lpair t) (f *^1 w)$, and we can then use \verb|mapM applyPair| to get $z : M n u (\verb|applyPair| (f *^1 w))$.
-Simplify, and we get $z : M n u (f w)$
-\subsection{combining and Spiting}
-
-\label{sec:combine_split}
-
-If we view \tmu as "vectors of linear values", then we should have an equivalent to vector concactination, \verb|++| \cite{idris_linear}.
-These correspond with the \gls{grtt} notion of context combination \cite{quant_graded_modal}.
-For $M$, we call these $\mcombine$, (in Idris \verb|combine|)
-
-It is defined as follows:
-
-\begin{minted}{idris}
-	combine : 
-		forall t, n, m. 
-		{0 w : t} -> 
-		M n t w -@ 
-		M m t w -@ 
-		M (n + m) t w
-	combine {w} MZ ys = ys
-	combine {w=x} (MS x xs) ys = MS x {w=x} (combine xs ys)
-\end{minted}
-
-This simply combines all the elements in a similar way to a list.
-In addition, we also have the inverse of \verb|combine|, \verb|split|\footnote{\texttt{split'} is described here. \texttt{split} essentially leaves the proof that the source does indeed have a index of $n+m$ up to the user with an \texttt{auto} implicit}:
-
-\begin{minted}{idris}
-	split' : forall t, w, n. {1 m : Nat} -> M (m + n) t w -@ LPair (M m t w) (M n t w)
-	split' {m=Z} xs = MZ # xs
-	split' {m=S m} (MS x xs) = let (ys # zs) = split' {m=m} ( xs) in (MS x {w=x} ys # zs)
-\end{minted}
+In a similar manner to how we proved (in \ref{lem:combine_comm}) the commutativity of \mcombine, we can prove that these are inverses.
 
 \begin{lemma}
-	\todo{Finish} split combine inverses
+	\label{lem:split_combine}
+	Given that we have $f \deq \ident split $, and $g \deq {\ident uncurry }^1 (\mcombine)$\footnote{Given that we have ${\indent uncurry}^1 : {(\fn1 \_ : a . \fn1 \_ : b . c)} \to \fn1 \_ : {(a \lpair b)} . c$}, then $f$ and $g$ are inverses.
 \end{lemma}
+\begin{proof}
+	The type of $f$ is $\fn1 \_ : {\tm {(m + n)} t w} . {{\tm m t w} \lpair {\tm n t w}}$, and that of $g$ is $\fn1 \_ : {{\tm m t w} \lpair {\tm n t w}} . \tm {(m + n)} t w$, so there composition $f \circ g : \fn1 - : {\tm {(m + n)} t w} . \tm {(m + n)} t w$ (the same for $g \circ f$).
+	Any function from a unique object and that same unique object is an identity, thereby these are inverses \needcite
+\end{proof}
 
-\subsection{Squashing and Expanding}
-
-\label{sec:squash_expand}
-
-\todo{Write section}
-
-\subsection{Associativity, Commutativity}
-
-\label{sec:assoc_comm}
-
-\todo{Write section}
-
-\subsection{Conversing Resources}
-
-\todo{Write section}
-
+One of the more notable constructions 

@@ -1,0 +1,74 @@
+\newcommand{\funwith}[1][\ensuremath{*}]{\ensuremath{\to_#1}}
+\newcommand{\proc}{\ensuremath{\gls{sym:lmap}}}
+\newcommand{\abst}{\ensuremath{\gls{sym:efun}}}
+\newcommand{\mz}{\gls{cons:exhaust}}
+\newcommand{\ms}{\gls{cons:provide}}
+\newcommand{\nsum}{\gls{cons:provide}}
+\newcommand{\tmu}{\gls{type:tmu}}
+\def\tm#1#2#3 {\ensuremath{\tmu \ #1 \ #2 \ #3}}
+\newcommand{\tomega}{\gls{type:Omega}}
+
+\newcommand{\mcombine}{\ensuremath{\otimes}} %TODO: Link to gloss
+\newcommand{\nat}{\gls{type:nats}}
+\newcommand{\tpe}{\gls{type:tpe}}
+\newcommand{\tset}{\ensuremath{\text{Part}}}
+\newcommand{\redux}{\ensuremath{\vartriangleright}}
+\newcommand{\fa}[1]{{\gls{sym:forall}}_{#1}}
+%\def\for#1:#2.#3{\ensuremath{\{#1 : #2\} \gls{sym:efun} #3}}
+%\newcommand{\fa}[1]{\ensuremath{#1 \gls{sym:forall}}}
+\def\ufun#1#2{{\ensuremath{#1 \gls{sym:efun} #2}}}
+\newcommand{\liso}{\ensuremath{\cong_1}}
+\newcommand{\nuse}[2]{\ensuremath{{#1}\#{#2}}}
+\newcommand{\lpair}{\ensuremath{\times^1}} %TODO: Link to gloss
+\newcommand{\ltup}{\ensuremath{*^1}} %TODO: Link to gloss
+\newcommand{\liniso}{\ensuremath{\cong_{\multimap}}}
+\newcommand{\carat}{\text{\textsuperscript{$\wedge$}}}
+\newcommand{\ccarat}{\carat\carat} %TODO: Find a less stupid way to do this
+\newcommand{\lincomp}[1][]{\ensuremath{\ifblank{#1}{\circ^1}{\circ^1_{#1}}}}
+\newcommand{\ecomp}[1][]{\ensuremath{\ifblank{#1}{\circ^{\exists_1}}{\circ^{\exists_1}_{#1}}}}
+\newcommand{\eomega}[4][n]{\ensuremath{{\for #1 : \nat . {\tmu \ (#2 \ #1) \ #3 \ #4}}}}
+\newcommand{\deq}{\ensuremath{:=}}
+\newcommand{\wrap}[1]{{\ensuremath{(#1)}}}
+\newcommand{\expexi}[4][n]{\ensuremath{\te1 #4 : #3 . \eomega[#1]{#2}{#3}{#4}}}
+
+\def\fn#1 #2:#3.#4 {{\ensuremath{%
+			\ifstrequal{-}{#2}{#3}{(#2 : #3)}%
+			\ifstrequal{#1}{*}{\to}{\to_{#1}}% 
+			#4%
+}}}
+
+\def\te#1#2:#3.#4 {{\ensuremath{%
+			\ifstrequal{#1}{*}{\exists}{\exists_{#1}}% 
+			\ifstrequal{#2}{?}{#3}{(#2 : #3)} . #4%
+}}}
+\def\sg#1#2:#3,#4 {{\ensuremath{%
+			\ifstrequal{#2}{\_}{#3}{(#2 : #3)}% 
+			\ifstrequal{#1}{*}{\times}{\times_{#1}} #4%
+}}}
+\def\tp#1#2:#3,#4 {{\ensuremath{%
+			\ifstrequal{#2}{\_}{#3}{(#2 : #3)}% 
+			\ifstrequal{#1}{*}{{*}}{{*}_{#1}} #4%
+}}}
+\def\fa#1#2:#3.#4 {{\ensuremath{%
+			\ifstrequal{#2}{\_}{\{#3\}}{\{#2 : #3\}}% 
+			\ifstrequal{#1}{*}{\to}{\to_{#1}} #4%
+		}}}
+\def\for#1:#2.#3 {{\ensuremath{\fa0 {#1}:{#2}.{#3} }}}
+\def\ident #1 {{\ensuremath{\texttt{#1}}}}
+\def\sigil #1 {{\ensuremath{#1}}}
+\def\tw#1#2#3{{\ensuremath{\tomega \ #1 \ #2 \ #3}}}
+
+\def\peq{\ensuremath{=_?}}
+%\newenvironment{idris}[2][]{%
+	%	\begin{listing} \ifblank{#1}{}{\label{#1}} \ifblank{#2}{}{\caption{#2}} \VerbatimEnvironment\begin{minted}{idris} } 
+		% { \end{minted} \end{listing} }
+	
+\todostyle{citation}{color=green!50,inline}
+\todostyle{missingcode}{color=green!50,inline}
+\todostyle{proof}{color=blue!50}
+\todostyle{finish}{color=orange!50}
+\todostyle{cleanup}{color=yellow!50}
+\def\needcite{{\todo[citation]{Need citation}}}
+\def\missingcode{{\todo[missingcode]{Need code}}}
+\def\expandthis{{\todo[cleanup]{Expand more on this}}}
+\def\finishthis{{\todo[finish]{Finish this}}}
