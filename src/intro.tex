@@ -1,15 +1,4 @@
 \section{Introduction}
 
-Idris shows the practical applications of \gls{qtt}, a branch of type theory based around the notion of \emph{usage}\cite{eb_idris_qtt_prac}.
-In particular, the ability for multiplicities to model both modality in logic and resource usage in programs adds yet another way to reason about programs, and is utilized by Linear Haskell (as an extension to the language) and as part of Idris 2 (as a core language) \cite{eb_idris_qtt_prac, linear_haskell}
-
-Idris 2's use of \gls{qtt} as a core language has been one of its strong selling points. 
-There are quite a few things that can be easily done with restricted bindings that cannot be done any other way.
-For instance, they provide a good model for type variables, proof irrelevance at runtime, a less magical system of IO, among other properties.
-
-Recently, however, there has been interest in \gls{grtt}, which allows for more dynamic restrictions on the usage of types, particularly allowing for usages greater than 1 \cite{quant_graded_modal}.
-Rather than arguing for the use of \gls{grtt} in Idris (which would add complexity), we instead propose a construction, $M$, that can model graded quantities using only linear types.
-
-Furthermore, a system is described that \emph{only} relies on types with multiplicities $0$ and $1$ to build a system (almost) as powerful as such as system with $\omega$.
-We do this by using the exponential construction, here called $\tmu$, to model arbitrary multiplicities.
-
+One of the more interesting developments in Programming Language Theory is Quantative Type Theory, or QTT.
+Based off Girard's linear logic, it forms the basis of the core syntax of Idris 2's core language, and also as a starting point for that of Linear Haskell \cite{idris,linear_haskell,linear_logic,syntax_semantics_linear_types}

@@ -1,2 +1,34 @@
 \section{$\omega$ and $\tomega$ Types}
 
+One of the more notable constructions in Girard's linear logic is the unrestricted, "of course", construction \cite{linear_logic}.
+This allows one to abstract infinitly many values of a given statement.
+In Granule, this is written as $[0 \dots \infty]$.
+
+We define a way to model statements these unrestricted bindings using $M$ bindings, which we call \tomega, or \ident Omega , which is defined in \ref{lst:Omega_def}. 
+
+\begin{listing}
+	\begin{minted}{idris}
+		0 Omega : (p : (Nat -@ Nat)) -> (t : Type) -> (w : t) -> Type
+		Omega p t w = (1 x : Nat) -> (Mu (p x) t w)
+	\end{minted}
+	\caption{Definition of the Omega type}
+	\label{lst:Omega_def}
+\end{listing}
+
+However, for now, we will restrict our view to $\omega$ types, which are defined as $\omega t w \deq \Omega (\lambda x . x) t w$.
+When we expand this, we get $\omega t w \deq \eomega{(\lambda x . x)}{t}{w}$, or, upon beta reduction, $\omega t w \deq \fa1 n : \nat . {\tm n t w}$
+Namely, this allows us to create any number of bindings of $w$.
+
+In this sense, we have an unrestricted value of $w$, as, whenever we need a value of a concrete $M$, we can just evaluate the continuation for some $n$.
+This is hinted at by the Granule syntax, for any $n$, we can create exactly $n$ bindings.
+We've already created a construction on $\omega$, namely, \ident genMu .
+Before, we listed $\ident genMu : \fn1 x : {!_* t} . \fa1 n : \nat . {\tm n t x.{\ident unrestricted }}$, however, we can replace the $\fa1 n : \nat . {\tm n t x.{\ident unrestricted }}$ with $\omega t w$, thereby yielding $\ident gen : \fn1 x : {!_* t} . \omega t {x.{\ident unrestricted }}$.
+
+\todo{Splitting Omega}
+\subsection{General $\Omega$}
+
+\subsection{Countable Sets}
+
+% https://proofwiki.org/wiki/Cartesian_Product_of_Countable_Sets_is_Countable
+
+\subsection{Resource Algebras}

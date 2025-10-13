@@ -3,7 +3,7 @@
 The core construction here is $M$, or, in Idris, \ident Mu , type.
 This is made to model a "source" of a given value.
 It is indexed by a natural number, a type, and an erased value of that type. 
-The definitions of this in Idris are given at \ref{lst:mu_def}
+The definitions of this in Idris are given at \ref{lst:mu_def}.
 
 \begin{definition}
 	$M$ is a polymorphic type with signature 
@@ -13,10 +13,10 @@ The definitions of this in Idris are given at \ref{lst:mu_def}
 In addition, $M$ has two constructors
 
 \begin{definition}
-	There are two constructors of $M$, $\mz$ \ident MZ , and $\odot$, \ident MS , Which have the singatures $\mz : \tm n t w$ and $\ms : \fn1 w : t . \fn1 \_ : {\tm n t w} . \tm {(S n)} t w$ 
+	There are two constructors of $M$, $\mz$ \ident MZ , and $\odot$, \ident MS , Which have the signatures $\mz : \tm n t w$ and $\ms : \fn1 w : t . \fn1 \_ : {\tm n t w} . \tm {(S n)} t w$ 
 \end{definition}
 
-Firstly, it should be noted taht the names were chose due to tthe fact that the indices of them are related. 
+Firstly, it should be noted that the names were chosen due to the fact that the indices of them are related. 
 That is, $\mz$  or "mu zero" will always be indexed by $0$, and $\ms$, "mu successor", is always indexed by the succesor of whatever is given in.
 
 \begin{listing}
@@ -36,21 +36,21 @@ That is, $\mz$  or "mu zero" will always be indexed by $0$, and $\ms$, "mu succe
 	\label{remark:only_zero}
 	$\tm 0 t w$ can only be constructed by $\mz$.
 \end{remark}
-Intuitivly, $M$ represents $n$ copies of $t$, all with the value $w$, very much inspired by the paper \citetitle{inverse_of_type}.
-For instance, if we want to construct $x : \tm 2 {\ident String } \verb|"value"|$, we can only construct this thorugh \ms, an we know, bu nothing but the first arguement of the value, that we must take as a initial arguement $\verb|value|$, and as a second value of the form $\tm 1 \ident String \verb|"value"|$, which we then repeat one more time and get another \verb|"value"| an finally we match $\tm 0 {\ident String } \verb|"value"|$ and get that we must have $\mz$. 
-We can then say that we kneow that the only constructors of $\tm 2 {\ident String } \verb|"String"|$ is $\verb|"value"| \ms \verb|"value"| \ms \mz$. Note the similarity between the natural number and the constructors. 
+Intuitively, $M$ represents $n$ copies of $t$, all with the value $w$, very much inspired by the paper \citetitle{inverse_of_type}.
+For instance, if we want to construct $x : \tm 2 {\ident String } \verb|"value"|$, we can only construct this through \ms, an we know, bu nothing but the first argument of the value, that we must take as a initial argument $\verb|value|$, and as a second value of the form $\tm 1 \ident String \verb|"value"|$, which we then repeat one more time and get another \verb|"value"| an finally we match $\tm 0 {\ident String } \verb|"value"|$ and get that we must have $\mz$. 
+We can then say that we know that the only constructors of $\tm 2 {\ident String } \verb|"String"|$ is $\verb|"value"| \ms \verb|"value"| \ms \mz$. Note the similarity between the natural number and the constructors. 
 Just as we get 2 by applying \ident S twice to \ident Z , we get $\tm 2 {\ident String } \verb|"value"|$ by applying $\ms$ twice to $\mz$. 
-This relationship betweeen $M$ types and numbers is far more extensive, as we will cover later 
+This relationship between $M$ types and numbers is far more extensive, as we will cover later. 
 
 The \ident w index or "witness" is the value being copied.
 Notably, if we remove the \ident w index, we would have $\mz : M n t$, and $\ms : t \to_1 M n t \to_1 M (S n) t$, which is simply \ident LVect. 
-The reason that this is undesirable is that we don't want this as it allows for $M$ to have hetrogeneous elements. 
+The reason that this is undesirable is that we don't want this as it allows for $M$ to have heterogeneous elements. 
 However, if we are talking about "copies" of something, we know that should all be the exact same.
 
 There are two very basic functions that bear mention with respect to $M$. The first of these is \ident witness , which is of the form $\ident witness :_0 \fa0 w : t . \tm n t w \to t$.
 Note that this is an \emph{erased} function.
 Its implementation is quite simple, just being $\ident witness \{w\} \_ \deq w$, which we can create, as erased functions can return erased values \needcite.
-In addition, we also have $\ident drop : \fn1 \_ : {\tm 0 t w} . ()$, which allows us to drop a value.
+In addition, we also have $\ident drop : \fn1 \_ : {\tm 0 t w} . \top$, which allows us to drop a value.
 Its signature is simple $\ident drop \mz \deq ()$.
 
 Finally, we have \ident once , which takes a value of form $M 1$ and extracts it into the value itself.
@@ -58,13 +58,13 @@ It has a signature $\ident once : \fn1 \_ : \tm 1 t w . t$, where we have $\iden
 
 \subsection{Uniqueness}
 
-While \ident w serves a greatj purpose in the interpretation of $M$ it perhasp serves an even greater purpose in terms of values of $M$.
-We can, using \sigil w, provate that there exists exactly one inhabitatent of the type $\tm n t w$, so long as that type is well formed.
+While \ident w serves a great purpose in the interpretation of $M$ it perhaps serves an even greater purpose in terms of values of $M$.
+We can, using \sigil w, prove that there exists exactly one inhabitant of the type $\tm n t w$, so long as that type is well formed.
 
 \todo{Segway into proof}
 
 \begin{lemma}
-	$x : \tm n t w$ only if the concrete value of $x$ contains $n$ applicationso f $\ms$.
+	$x : \tm n t w$ only if the concrete value of $x$ contains $n$ applications of $\ms$.
 \end{lemma}
 \begin{proof}
 	Induct on \sigil n, the first case, $\tm 0 t w$, contains zero applications of \ms, as it is \mz.
@@ -91,6 +91,23 @@ This is equivalent to the statement "there exists at most one $M$" \needcite.
 	We thereby can simply this to the fact that $\tm n' t w$ has the above property, which is the induction hypothesis.
 \end{proof}
 
+\begin{listing}
+	\begin{minted}{idris}
+		0 unique : 
+			{n : Nat} -> {t : Type} -> {w : t} -> 
+			{a : Mu n t w} -> {b : Mu n t w} -> 
+			(a === b)
+		unique {n=Z} {w=w} {a=MZ,b=MZ} = Refl 
+		unique {n=(S n')} {w=w} {a=MS w xs, b=MS w ys} = rewrite__impl 
+			(\zs => MS w xs === MS w zs)
+			(unique {a=ys} {b=xs})
+			Refl
+	
+	\end{minted}
+	\caption{Proof of \ref{lem:all_eq} in Idris}
+	\label{lst:all_eq}
+\end{listing}
+
 \todo[cleanup]{Finish proof}
 
 However, we can make a even more specific statement, given the fact we know that $w$ is an inhabitent of $t$.
@@ -113,6 +130,7 @@ This is very important for proofs on $M$.
 It corresponds to the fact that there is only one way to copy something, to provide another value that is the exact same as the first.
 
 \subsection{Graded Modalities With $M$}
+
 \label{sec:grade_mu}
 A claim was made earlier that $M$ types can be used to model graded modalities within QTT.
 The way it does this, however, is not by directly equating $M$ types with $[]$ types \cite{quant_graded_modal}.
@@ -124,7 +142,8 @@ Fortunately, due to the fact that this is Idris 2, we don't need a separate $\Vd
 This is incredibly powerful.
 Not only can we reason about graded modalities in Idris, we can reason about them in the language itself, rather than as part of the syntax, which allows us to employ regular proofs on them.
 This is very apparent in the way constructions are devised. 
-For instance, while Granule requires separate rules for dereliction, we do not, and per as a matter of fact we just define it as \ident once ; a similar relationship exists between weakening and \ident drop . 
+For instance, while Granule requires separate rules for dereliction, we do not, and per as a matter of fact we just define it as \ident once ; a similar relationship exists between weakening and \ident drop where the exact relationship is shown in \ref{fig:meta_drop}. 
+
 
 \begin{remark}
 	\label{remark:mu_grade_eq}
@@ -133,6 +152,20 @@ For instance, while Granule requires separate rules for dereliction, we do not, 
 
 Unfortunately, there is no way to prove this in either language, as $M$ can't be constructed in Granule, and graded modal types don't exist in Idris 2.
  
+\begin{figure}
+	\begin{prooftree}
+		\hypo{\Gamma \vdash \alpha} 
+		\infer1[Weak]{\Gamma, [w] : [t]_0 \vdash \alpha}
+	\end{prooftree}
+	
+	\begin{minted}{idris}
+		weak : (ctx -@ a) -@ ((LPair ctx (Mu 0 t w)) -@ a)
+		weak f (x # MZ) = f x
+	\end{minted}
+	\label{fig:meta_drop}
+	\caption{The meta-logical \ident drop rule and its Idris 2 equivalent}
+\end{figure}
+
 \subsection{Operations on $M$}
 
 There are number of operations that are very important on $M$.
@@ -169,7 +202,7 @@ We can this function, which is the inverse of \ident combine , \ident split , wh
 We actually use this a fair bit more than we use \ident combine , as \ident split doesn't impose any restrictions on the witness, which is very useful for when we discuss \carat types.
 
 In a similar manner to how we proved (in \ref{lem:combine_comm}) the commutativity of \mcombine, we can prove that these are inverses.
-
+\todo{Add something on metalogical interpretation}
 \begin{lemma}
 	\label{lem:split_combine}
 	Given that we have $f \deq \ident split $, and $g \deq {\ident uncurry }^1 (\mcombine)$\footnote{Given that we have ${\indent uncurry}^1 : {(\fn1 \_ : a . \fn1 \_ : b . c)} \to \fn1 \_ : {(a \lpair b)} . c$}, then $f$ and $g$ are inverses.
@@ -179,4 +212,48 @@ In a similar manner to how we proved (in \ref{lem:combine_comm}) the commutativi
 	Any function from a unique object and that same unique object is an identity, thereby these are inverses \needcite
 \end{proof}
 
-One of the more notable constructions 
+Another relevant construction is multiplicity "joining" and its inverse, multiplicity "expanding".
+\begin{definition}
+	We define $\ident join : \tm m {(\tm n t w)} ?$\footnote{For simplicity, we infer the second witness}.
+	Its definition is like that of natural number multiplication, with it defined as follows:
+	
+	\begin{math}
+		\ident join \mz \deq \mz \\
+		\ident join (x_0 \ms x_1) \deq x_0 \mcombine (\ident join x_1)
+	\end{math} 
+\end{definition}
+
+\subsection{Applications over $M$}
+
+There is still one crucial operation that we have not yet mentioned, and that is application over $M$.
+That is, we want a way to be able to lift a linear function into $M$.
+We can do this, and we call it \ident map , due to its similarity to functorial lifting and its definition may be found \ref{lst:def_map}.
+
+\begin{listing}
+	\begin{minted}{idris}
+		map : (f : t -@ u) -> Mu n t w -@ Mu n u (f w)
+		map f MZ = MZ
+		map f (MS x xs) = MS (f x) (map {w=x} f xs)
+	\end{minted}
+	\caption{Definition of \ident map in Idris}
+	\label{lst:def_map}
+\end{listing}
+
+However, there is something unsatisfying about \ident map .
+Namely, the first arguement is unrestricted.
+However, we \emph{know} exactly how many of the function we need.
+It will simply be the same as the number of arguements.
+
+So, we define another function, \ident app , which has the type $\ident app : \fn1 f : {\tm n {(\fn1 \_ : t . u)} {w_f}} . \fn1 x : {\tm n t {w_x}} . {\tm n u {(w_f w_x)}}$, and a defintion given at \ref{lst:def_app}
+
+\begin{listing}
+	\begin{minted}{idris}
+		app : Mu n (t -@ u) wf -> Mu n t wx -@ Mu n u (wf wx)
+		app MZ MZ = MZ 
+		app (MS f fs) (MS x xs) = MS (f x) (app fs xs)
+	\end{minted}
+	\caption{Definition of \ident app }
+	\label{lst:def_app}
+\end{listing}
+
+Notably, if we define a function $\ident genMu : \fn1 x : {!_* t} . \fa1 n : \nat . {\tm n t x.{\ident unrestricted }}$, which is simply defined as $\ident genMu (\ident MkBang \_) 0 \deq \mz$ and $\ident genMu (\ident MkBang x) (S n) \deq (x \ms (\ident genMu n (\ident MkBang x)))$, we can define \ident map as $\ident map \{n\} f x \deq \ident app (\ident genMu f n) x$ \todo{This isn't exactly correct}
