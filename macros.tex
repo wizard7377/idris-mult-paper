@@ -31,34 +31,42 @@
 \newcommand{\wrap}[1]{{\ensuremath{(#1)}}}
 \newcommand{\expexi}[4][n]{\ensuremath{\te1 #4 : #3 . \eomega[#1]{#2}{#3}{#4}}}
 
+
 \def\fn#1 #2 :#3.#4 {{\ensuremath{%
 			\ifstrequal{#2}{\_}{#3}{(#2 : #3)}%
 			\ifstrequal{#1}{*}{\to}{\to_{#1}}% 
 			#4%
 }}}
 
-\def\te#1#2:#3.#4 {{\ensuremath{%
-			\ifstrequal{#1}{*}{\exists}{\exists_{#1}}% 
-			\ifstrequal{#2}{?}{#3}{(#2 : #3)} . #4%
+
+\def\fa#1#2 :#3.#4 {{\ensuremath{%
+			\forall\ifstrequal{#2}{\_}{#3}{(#2 : #3)}% 
+			\ifstrequal{#1}{*}{\to}{\to_{#1}} #4%
 }}}
-\def\sg#1#2:#3,#4 {{\ensuremath{%
+\def\afa#1#2 :#3.#4 {{\ensuremath{%
+			\forall\ifstrequal{#2}{\_}{#3}{(#2 : #3)}% 
+			\ifstrequal{#1}{*}{\Rightarrow}{\Rightarrow_{#1}} #4%
+}}}
+\def\sg#1 #2 :#3.#4 {{\ensuremath{%
 			\ifstrequal{#2}{\_}{#3}{(#2 : #3)}% 
 			\ifstrequal{#1}{*}{\times}{\times_{#1}} #4%
 }}}
-\def\tp#1#2:#3,#4 {{\ensuremath{%
+\def\tp#1 #2 :#3.#4 {{\ensuremath{%
 			\ifstrequal{#2}{\_}{#3}{(#2 : #3)}% 
 			\ifstrequal{#1}{*}{{*}}{{*}_{#1}} #4%
 }}}
-\def\fa#1#2:#3.#4 {{\ensuremath{%
-			\forall\ifstrequal{#2}{\_}{#3}{(#2 : #3)}% 
-			\ifstrequal{#1}{*}{\to}{\to_{#1}} #4%
-		}}}
+\def\te#1#2:#3.#4 {{\ensuremath{%
+			\ifstrequal{#1}{*}{\exists}{\exists_{#1}}% 
+			\ifstrequal{#2}{\_}{#3}{(#2 : #3)} . #4%
+}}}
 \def\for#1:#2.#3 {{\ensuremath{\fa0 {#1}:{#2}.{#3} }}}
 \def\ident #1 {\ensuremath{\texttt{#1}}\xspace}
 \def\sigil #1 {\ensuremath{#1}\xspace}
 \def\tw#1#2#3{{\ensuremath{\tomega \ #1 \ #2 \ #3}}}
 
 \def\peq{\ensuremath{=_?}}
+\def\omegapred{\ensuremath{\Omega_{\texttt{Pred}}}}
+\def\omegaproj{\ensuremath{\Omega_{\texttt{Proj}}}}
 %\newenvironment{idris}[2][]{%
 	%	\begin{listing} \ifblank{#1}{}{\label{#1}} \ifblank{#2}{}{\caption{#2}} \VerbatimEnvironment\begin{minted}{idris} } 
 		% { \end{minted} \end{listing} }
@@ -68,7 +76,15 @@
 \todostyle{proof}{color=blue!50}
 \todostyle{finish}{color=orange!50}
 \todostyle{cleanup}{color=yellow!50}
+%\usepackage{xspace}
+\newcommand{\code}[1]{\ensuremath{\mathtt{#1}\xspace}}
+%\newmintinline[code]{idris}{}
 \def\needcite{{\todo[citation]{Need citation}}}
 \def\missingcode{{\todo[missingcode]{Need code}}}
 \def\expandthis{{\todo[cleanup]{Expand more on this}}}
 \def\finishthis{{\todo[finish]{Finish this}}}
+\def\marker #1 {{\todo[missingcode]{#1}}}
+\def\pred#1{{\ensuremath{\code{Pred} \ #1}}}
+\def\granule{Granule}
+\def\idris{Idris}
+\def\thislib{\code{idris-mult}\ref{sec:this_lib}}

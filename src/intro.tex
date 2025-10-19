@@ -1,4 +1,23 @@
 \section{Introduction}
 
 One of the more interesting developments in Programming Language Theory is Quantative Type Theory, or QTT.
-Based off Girard's linear logic, it forms the basis of the core syntax of Idris 2's core language, and also as a starting point for that of Linear Haskell \cite{idris,linear_haskell,linear_logic,syntax_semantics_linear_types}
+Based off Girard's linear logic, it forms the basis of the core syntax of Idris 2's core language, and also as a starting point for that of Linear Haskell \cite{idris,linear_haskell,linear_logic,syntax_semantics_linear_types}.
+It has many theoretical applications, including creating a more concrete interpretation of the concept of a "real world", constraining memory usage, and allowing for safer foriegn interfaces \needcite. 
+Apart from just the theoretical intrest, QTT has the potential to serve as an underlying logic for languages like Rust, where reasoning about resources takes the forfront.
+
+However, new developments in Graded Modal Type Theory (GrTT), in particular with Granule, serve to create a finer grained\footnote{Hence the name} notion of usage thatn QTT.
+In GrTT, any natural number may serve as a usage, and in some cases even things that are first glance not natural numbers.
+GrTT is part of a larger trend of "types with algbras" being used to create inferable, simple, and intuitive systems for models of various things.
+Of these, some of the more notable ones are Koka, Effekt, and Flix, all of which seek to model effects with algebras \cite{flix_paper,effekt,koka_1}.
+
+\subsection*{Preliminaries}
+
+We write the morphisms in a given category $\to_{\mathcal{C}}$, where $\mathcal{C}$ is the category in question.
+We define $1$ to be the category of Idris terms where the morphisms are all linear mappings, $0$ to be that where they are all erased, and $\omega$ for those that are unrestricted.
+We write these arrows at $\to_1$, $\to_0$, and $\to_\omega$, respectively.
+
+We also write isomorphisms in a certain category $\mathcal{C}$ as $\simeq_{\mathcal{C}}$, and in particular we have $\simeq_1$ as the isomorphism in the linear category.
+We write implicit $\Pi$ types prefixed with a $\forall$, so, for instance, we have $\fa1 x : t . u$ as the equivalent of the Idris \verb|{1 x : t} -> u|.
+We write $\times^{\mathcal{C}}$ for the product construction in $\mathcal{C}$, and for a given evidence of that construction we write that with the constructor $*^{\mathcal{C}}$
+
+In addition, note that we write $\nat$ for the type of \emph{linear} natural numbers \needcite.

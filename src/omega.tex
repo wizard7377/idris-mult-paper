@@ -1,34 +1,65 @@
-\section{$\omega$ and $\tomega$ Types}
+\section{$\omega$ and $\Omega$ Types}
 
-One of the more notable constructions in Girard's linear logic is the unrestricted, "of course", construction \cite{linear_logic}.
-This allows one to abstract infinitly many values of a given statement.
-In Granule, this is written as $[0 \dots \infty]$.
+\label{sec:omega_types}
 
-We define a way to model statements these unrestricted bindings using $M$ bindings, which we call \tomega, or \ident Omega , which is defined in \ref{lst:Omega_def}. 
+The $\omega$ type and their generalization \tomega types, serve to model unrestricted multiplicty. 
+An unrestricted multiplicity as one that can create any number of linearly bound terms, which is written by Girard as \code{!} (``of course''), $\omega$ in Idris, and $t \code{[]}$ in \granule \cite{linear_logic,idris,granule}. 
+Further, in other works of embedding a linear logic system with unrestricted multiplicity into a more restrictive system, the system of natural number was extended to conatural numbers, which contain $\infty$.
 
-\begin{listing}
-	\begin{minted}{idris}
-		0 Omega : (p : (Nat -@ Nat)) -> (t : Type) -> (w : t) -> Type
-		Omega p t w = (1 x : Nat) -> (Mu (p x) t w)
-	\end{minted}
-	\caption{Definition of the Omega type}
-	\label{lst:Omega_def}
-\end{listing}
+Here, we propose \tomega types, and a more specific form of them, $\omega$ types, which are written in \thislib as \code{omega}.
+We will first look at $\omega$ types, as they are a fair bit simpler than $\Omega$ types.
 
-However, for now, we will restrict our view to $\omega$ types, which are defined as $\omega t w \deq \Omega (\lambda x . x) t w$.
-When we expand this, we get $\omega t w \deq \eomega{(\lambda x . x)}{t}{w}$, or, upon beta reduction, $\omega t w \deq \fa1 n : \nat . {\tm n t w}$
-Namely, this allows us to create any number of bindings of $w$.
+\begin{definition}
+	$\omega$ is a type alias which takes a type and a witness of that type as arguments, we define it as $\omega \ t \ w \deq \fn1 n : \nat . \tm n t w$
+\end{definition}
 
-In this sense, we have an unrestricted value of $w$, as, whenever we need a value of a concrete $M$, we can just evaluate the continuation for some $n$.
-This is hinted at by the Granule syntax, for any $n$, we can create exactly $n$ bindings.
-We've already created a construction on $\omega$, namely, \ident genMu .
-Before, we listed $\ident genMu : \fn1 x : {!_* t} . \fa1 n : \nat . {\tm n t x.{\ident unrestricted }}$, however, we can replace the $\fa1 n : \nat . {\tm n t x.{\ident unrestricted }}$ with $\omega t w$, thereby yielding $\ident gen : \fn1 x : {!_* t} . \omega t {x.{\ident unrestricted }}$.
+We can thence, if we have $x : \omega t w$, get any number of bindings of the value $w$ of $t$.
+This can then be used to model multipliciites.
+Firstly, let us note how we might construct these.
 
-\todo{Splitting Omega}
-\subsection{General $\Omega$}
+\begin{definition}
+  \ident gen goes from a value in a linear unrestricted multiplicity, $!_*$, and a value of $\omega$.
+  Spefically, \ident gen has the type signature $\code{gen} : \fn1 x : (!_* t) . \omega t (\code{unrestricted} x)$..
+  It has the definition of \missingcode .
+\end{definition}
 
-\subsection{Countable Sets}
+This also us to unpack a value of unrestricted multiplicity into some number of linear bindings.
+\todo{Using omega types}
 
-% https://proofwiki.org/wiki/Cartesian_Product_of_Countable_Sets_is_Countable
+\subsection{$\Omega$ types}
 
-\subsection{Resource Algebras}
+Whilst $\omega$ types allow us to model general unrestricted multiplicities, they dont allow for for restricted multiplicity polymorphic functions.
+For instance, consdier the function in \granule \ident mapMaybe, \marker type .
+We define this with $\omega$ and \tmu types as \marker def where we define the erased value \marker MapMaybeW .
+
+However, this would be overly specific. 
+Considering the \granule equivalent, it is clear what the problem is. 
+Namely, we will use \ident f at most once, so we don't need \emph{any} number of usages of \ident f .
+We need at most one instance of \ident f .
+This has real world consequences.
+For instance, if we have $\code{x} : \nat$, we might construct $f : \fn1 \_ : \nat . \nat$, $f y \deq x + y$.
+
+In addition, we can discard this by merely doing $f \code{Zero}$, which then has the type $\nat$, which we can freely discard.
+So, we have a way to get either 0 or 1 instances of $f$, but not, in general, to get any number of these.
+
+This isn't a mu type, as there are two choices, 0 and 1, for the multiplicity.
+However, it also isn't an $\omega$ type, as we need not be able to produce any number of values.
+To solve this dilemena, we introduce $\tomega$ types, a generalization of $\omega$ types to require only a subset of $\nat$ bindings.
+
+Firstly, we note that is Idris, \verb|Type| and \verb|Prop| are synonymus.
+We also note that then a prediciate on a type $\pred{a}$, is just equivalent to $\fn* \_ : a . \tpe$ \cite{proofs_and_types}.
+We can likewise define a number of relevant operations on $\pred{a}$, which are given in more detail in \thislib \verb|Data.Mu.Maps|.
+
+One of the more interesting facts about predicates is that they are contravariant functors.
+% We define the \verb|contramap| function with the name \code{PMap}, and with signature $\code{PMap} : \fn* \_ : (\fn* \_ : a . b) . \fn* \_ : \pred{b} . \pred{a}$.
+We also define in a slightly less interesting fashioin a number of other general predicate functions.
+
+We in particular focus our attetetion on \pred{\nat}, which we can use to define \tomega as follows:
+
+\begin{definition}
+  \tomega is a polymorphic type over a predicate on \nat, $p$, a given type $t$, and a witness of that type $w$, $\tomega : \fn* p : \pred{\nat} . \fn* t : \tpe . \fn* w : t . \tpe$.
+  We define $\tomega$ as $\tw p t w \deq \fn1 n : \nat . \afa0 \code{prf} : (p n) . \tm n t w$.
+\end{definition}
+
+So, to get a certain number of bindings of $w$, we must provide a proof that the given number of bindings satisfies some arbitrary predicate $p$.
+\todo{Finish, among things, work on 3A}

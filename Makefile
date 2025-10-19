@@ -1,6 +1,8 @@
 SOURCES := $(wildcard *.tex) $(wildcard src/*.tex) bibliography.bib
-LATEX ?= lualatex
-OPTS += 
+LATEX ?= pdflatex
+OPTS += -halt-on-error 
+
+all: clean main.pdf
 main.pdf: $(SOURCES)
 	$(LATEX) $(OPTS) main.tex
 clean: 

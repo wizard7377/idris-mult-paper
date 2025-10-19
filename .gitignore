@@ -330,3 +330,6 @@ _minted
 *.pdf
 
 !main.pdf
+
+**_region**
+.vscode

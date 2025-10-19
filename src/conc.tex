@@ -2,6 +2,23 @@
 
 \subsection*{Related Work}
 
+\paragraph{GrTT and QTT}
+While QTT, in particular as described here, is quite useful, it of course has its limits.
+In particular, the work of languages like \granule to create a generalized notion of this in a way that can easily be infered and checked is important.
+However, in terms of QTT (or even systems outside of it) this is far from complete.
+
+\paragraph{The Syntax}
+For instance, even with the \carat types, the syntax for this, and more generally linearity in general, tends to be a bit hard to use.
+A question of how to integrate into the source syntax would be quite interesting.
+Also, in general, one of the advantages of making an algebra part of the core language itself (as opposed to a construction on top of it) is that it makes it easier to create an inference engine for that language..
+
+\paragraph{Bump Allocation}
+QTT has been discussed as a potential theoretical model for ownership systems.
+One of the more useful constructs in such a system is bump allocation.
+With particular use seen in compilers, bump arena allocation, where memory is pre-allocated per phase, helps both seperate and simplify memory usage.
+It is possible that a usage of $M$ types (given the fact that we know exactly how many times we need a value) as a form of modeling of arena allocation might be useful.
+
+
 \subsection*{Acknowledgements}
 
 Thank you to the Idris team for helping provide guidance and review for this.
@@ -9,4 +26,5 @@ In particular, I would like to thank Constantine for his help in the creation of
 
 \subsection*{Artifacts}
 
-All Idris code mentioned here is either directly from or derived from the code in the Idris library \verb|idris-mult|, which may be found at \todo{Add link}.
+\label{sec:this_lib}
+All Idris code mentioned here is either directly from or derived from the code in the Idris library \verb|idris-mult|, which may be found at \href{https://github.com/wizard7377/idris-mult}{its repository}\footnote{Some listings may be modified for readability}
