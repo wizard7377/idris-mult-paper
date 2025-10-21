@@ -1,0 +1,30 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: idris-mult
+message: Graded Modalities as Linear Types
+type: software
+authors:
+  - given-names: Asher
+    family-names: Frost
+    orcid: 'https://orcid.org/0009-0000-1043-4054'
+identifiers:
+  - type: url
+    value: 'https://github.com/wizard7377/idris-mult-paper'
+    description: The paper
+  - type: url
+    value: 'https://github.com/wizard7377/idris-mult'
+    description: The library
+repository-code: 'https://github.com/wizard7377/idris-mult'
+repository: 'https://github.com/wizard7377/idris-mult-paper'
+abstract: >-
+  We present an approach that models graded modal bindings
+  using only linear ones. Inspired by Granule, we present an
+  approach in Idris 2 to model limited grades using a
+  construction, called "mu" (M). We present the construction
+  of M, related ones, operations on them, and some useful
+  properties
+keywords:
+  - idris2
+  - qtt
