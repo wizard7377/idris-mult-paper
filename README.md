@@ -1,0 +1,3 @@
+A preprint of the paper `Graded Modalities as Linear Types`.
+Not for redistribution.
+Library may be found at...
