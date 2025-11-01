@@ -1,65 +1,18 @@
-\section{$\omega$ and $\Omega$ Types}
+
+\section{$\Omega$ Types}
 
 \label{sec:omega_types}
 
-The $\omega$ type and their generalization \tomega types, serve to model unrestricted multiplicty. 
-An unrestricted multiplicity as one that can create any number of linearly bound terms, which is written by Girard as \code{!} (``of course''), $\omega$ in Idris, and $t \code{[]}$ in \granule \cite{linear_logic,idris,granule}. 
-Further, in other works of embedding a linear logic system with unrestricted multiplicity into a more restrictive system, the system of natural number was extended to conatural numbers, which contain $\infty$.
+The principle use of \code{Form} here is as part of the $\Omega$ construction, which uses it to constraint over mutliplicity, thereby giving us an equivalent of \granule effect formulas,
 
-Here, we propose \tomega types, and a more specific form of them, $\omega$ types, which are written in \thislib as \code{omega}.
-We will first look at $\omega$ types, as they are a fair bit simpler than $\Omega$ types.
+\subsection{Poly-multiplicative Judgments}
 
 \begin{definition}
-	$\omega$ is a type alias which takes a type and a witness of that type as arguments, we define it as $\omega \ t \ w \deq \fn1 n : \nat . \tm n t w$
+	\label{def:Omega_ty}
+	$\Omega$ is a type indexed by a formula, $\phi$, a type $t$, and a witness of that type, such that $\tw \phi t w \deq_0 \tw_n \phi t w$
 \end{definition}
 
-We can thence, if we have $x : \omega t w$, get any number of bindings of the value $w$ of $t$.
-This can then be used to model multipliciites.
-Firstly, let us note how we might construct these.
-
-\begin{definition}
-  \ident gen goes from a value in a linear unrestricted multiplicity, $!_*$, and a value of $\omega$.
-  Spefically, \ident gen has the type signature $\code{gen} : \fn1 x : (!_* t) . \omega t (\code{unrestricted} x)$..
-  It has the definition of \missingcode .
-\end{definition}
-
-This also us to unpack a value of unrestricted multiplicity into some number of linear bindings.
-\todo{Using omega types}
-
-\subsection{$\Omega$ types}
-
-Whilst $\omega$ types allow us to model general unrestricted multiplicities, they dont allow for for restricted multiplicity polymorphic functions.
-For instance, consdier the function in \granule \ident mapMaybe, \marker type .
-We define this with $\omega$ and \tmu types as \marker def where we define the erased value \marker MapMaybeW .
-
-However, this would be overly specific. 
-Considering the \granule equivalent, it is clear what the problem is. 
-Namely, we will use \ident f at most once, so we don't need \emph{any} number of usages of \ident f .
-We need at most one instance of \ident f .
-This has real world consequences.
-For instance, if we have $\code{x} : \nat$, we might construct $f : \fn1 \_ : \nat . \nat$, $f y \deq x + y$.
-
-In addition, we can discard this by merely doing $f \code{Zero}$, which then has the type $\nat$, which we can freely discard.
-So, we have a way to get either 0 or 1 instances of $f$, but not, in general, to get any number of these.
-
-This isn't a mu type, as there are two choices, 0 and 1, for the multiplicity.
-However, it also isn't an $\omega$ type, as we need not be able to produce any number of values.
-To solve this dilemena, we introduce $\tomega$ types, a generalization of $\omega$ types to require only a subset of $\nat$ bindings.
-
-Firstly, we note that is Idris, \verb|Type| and \verb|Prop| are synonymus.
-We also note that then a prediciate on a type $\pred{a}$, is just equivalent to $\fn* \_ : a . \tpe$ \cite{proofs_and_types}.
-We can likewise define a number of relevant operations on $\pred{a}$, which are given in more detail in \thislib \verb|Data.Mu.Maps|.
-
-One of the more interesting facts about predicates is that they are contravariant functors.
-% We define the \verb|contramap| function with the name \code{PMap}, and with signature $\code{PMap} : \fn* \_ : (\fn* \_ : a . b) . \fn* \_ : \pred{b} . \pred{a}$.
-We also define in a slightly less interesting fashioin a number of other general predicate functions.
-
-We in particular focus our attetetion on \pred{\nat}, which we can use to define \tomega as follows:
-
-\begin{definition}
-  \tomega is a polymorphic type over a predicate on \nat, $p$, a given type $t$, and a witness of that type $w$, $\tomega : \fn* p : \pred{\nat} . \fn* t : \tpe . \fn* w : t . \tpe$.
-  We define $\tomega$ as $\tw p t w \deq \fn1 n : \nat . \afa0 \code{prf} : (p n) . \tm n t w$.
-\end{definition}
-
-So, to get a certain number of bindings of $w$, we must provide a proof that the given number of bindings satisfies some arbitrary predicate $p$.
-\todo{Finish, among things, work on 3A}
+That is, an $\Omega$ designates a function from a natural number to a certain number of $t$.
+However, this is often unedsierable, so we instead efine a helper function, reify, of the type $\fn_1{\tw \phi t w}{\fa_1[n]{\nat}{\afa_0{(n \in \phi)}{\tm n t w}}}$, which, allows for us to instead consider if the number in is in the ``solution set'' as opposed to a value projected to.
+  
+The most simple form of $\Omega$ is that where $\phi$ is \code{FVar} and thus
