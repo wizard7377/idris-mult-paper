@@ -7,13 +7,13 @@ The definitions of this in Idris are given at \ref{lst:mu_def}.
 
 \begin{definition}
 	$M$ is a polymorphic type with signature 
-	$M : \fn0 n : \nat . \fn0 t : \tpe . \fn0 w : t . \tpe$
+	$M : \oldfn(S m') n : \nat . \oldfn0 t : \tpe . \oldfn0 w : t . \tpe$
 \end{definition}
 
 In addition, $M$ has two constructors
 
 \begin{definition}
-	There are two constructors of $M$, $\mz$ \code{MZ}, and $\odot$, \code{MS}, Which have the signatures $\mz : \tm n t w$ and $\ms : \fn1 w : t . \fn1 \_ : {\tm n t w} . \tm {(S n)} t w$ 
+	There are two constructors of $M$, $\mz$ \code{MZ}, and $\odot$, \code{MS}, Which have the signatures $\mz : \tm n t w$ and $\ms : \oldfn1 w : t . \oldfn1 \_ : {\tm n t w} . \tm {(S n)} t w$ 
 \end{definition}
 
 Firstly, it should be noted that the names were chosen due to the fact that the indices of them are related. 
@@ -36,8 +36,10 @@ That is, $\mz$  or ``mu zero'' will always be indexed by $0$, and $\ms$, ``mu su
 	\label{remark:only_zero}
 	$\tm 0 t w$ can only be constructed by $\mz$.
 \end{remark}
+
 Intuitively, $M$ represents $n$ copies of $t$, all with the value $w$, very much inspired by the paper \citetitle{inverse_of_type}.
 For instance, if we want to construct $x : \tm 2 {\code{String}} \verb|"value"|$, we can only construct this through \ms, an we know, bu nothing but the first argument of the value, that we must take as a initial argument $\verb|value|$, and as a second value of the form $\tm 1 \code{String} \verb|"value"|$, which we then repeat one more time and get another \verb|"value"| an finally we match $\tm 0 {\code{String}} \verb|"value"|$ and get that we must have $\mz$. 
+
 We can then say that we know that the only constructors of $\tm 2 {\code{String}} \verb|"String"|$ is $\verb|"value"| \ms \verb|"value"| \ms \mz$. Note the similarity between the natural number and the constructors. 
 Just as we get 2 by applying \code{S}twice to \code{Z}, we get $\tm 2 {\code{String}} \verb|"value"|$ by applying $\ms$ twice to $\mz$. 
 This relationship between $M$ types and numbers is far more extensive, as we will cover later. 
@@ -47,14 +49,14 @@ Notably, if we remove the \code{w}index, we would have $\mz : M n t$, and $\ms :
 The reason that this is undesirable is that we don't want this as it allows for $M$ to have heterogeneous elements. 
 However, if we are talking about ``copies'' of something, we know that should all be the exact same.
 
-There are two very basic functions that bear mention with respect to $M$. The first of these is \code{witness}, which is of the form $\code{witness}:_0 \fa0 w : t . \tm n t w \to t$.
+There are two very basic functions that bear mention with respect to $M$. The first of these is \code{witness}, which is of the form $\code{witness}:_0 \oldfa0 w : t . \tm n t w \to t$.
 Note that this is an \emph{erased} function.
 Its implementation is quite simple, just being $\code{witness}\{w\} \_ \deq w$, which we can create, as erased functions can return erased values \needcite.
-In addition, we also have $\code{drop}: \fn1 \_ : {\tm 0 t w} . \top$, which allows us to drop a value.
+In addition, we also have $\code{drop}: \fn{{\tm 0 t w}}{\top}$, which allows us to drop a value.
 Its signature is simple $\code{drop}\mz \deq ()$.
 
 Finally, we have \code{once}, which takes a value of form $M 1$ and extracts it into the value itself.
-It has a signature $\code{once}: \fn1 \_ : \tm 1 t w . t$, where we have $\code{once}(x \ms \mz) \deq x$
+It has a signature $\code{once}: \oldfn1 \_ : \tm 1 t w . t$, where we have $\code{once}(x \ms \mz) \deq x$
 
 \subsection{Uniqueness}
 
@@ -170,7 +172,7 @@ Unfortunately, there is no way to prove this in either language, as $M$ can't be
 
 There are number of operations that are very important on $M$.
 The first of these that we will discuss is combination.
-We define this as $\mcombine : \fn1 \_ : {\tm m t w} . \fn1 \_ : {\tm n t w} . \tm {(m + n)} t w$\missingcode, and we define it inductivly as $\ms \mcombine x \deq x$, and $(a \ms b) \mcombine x \deq a \ms (b \mcombine x)$.
+We define this as $\mcombine : \oldfn1 \_ : {\tm m t w} . \oldfn1 \_ : {\tm n t w} . \tm {(m + n)} t w$\missingcode, and we define it inductivly as $\ms \mcombine x \deq x$, and $(a \ms b) \mcombine x \deq a \ms (b \mcombine x)$.
 Note the similarity between the natural number indicies and the values, where $0 + x \deq x$ and $(S n) + x \deq S (n + x)$
 
 \todo[cleanup]{Fix the alignement of these}
@@ -198,17 +200,17 @@ Per as a matter of fact, it isn't actually possible to construct \mcombine in Gr
 \end{proof}
 
 Given that we can ``add'' (Or, as we will see later, multiply) two $M$, it would seem natural that we could also subtract them.
-We can this function, which is the inverse of \code{combine}, \code{split}, which has the signature $\code{split}: \fn1 n : \nat . \fn1 - : {\tm {(m + n)} t w} . {{\tm m t w} \lpair {\tm n t w}}$.
+We can this function, which is the inverse of \code{combine}, \code{split}, which has the signature $\code{split}: \oldfn1 n : \nat . \oldfn1 - : {\tm {(m + n)} t w} . {{\tm m t w} \lpair {\tm n t w}}$.
 We actually use this a fair bit more than we use \code{combine}, as \code{split}doesn't impose any restrictions on the witness, which is very useful for when we discuss \carat types.
 
 In a similar manner to how we proved (in \ref{lem:combine_comm}) the commutativity of \mcombine, we can prove that these are inverses.
 \todo{Add something on metalogical interpretation}
 \begin{lemma}
 	\label{lem:split_combine}
-	Given that we have $f \deq \code{split}$, and $g \deq {\code{uncurry}}^1 (\mcombine)$\footnote{Given that we have ${\indent uncurry}^1 : {(\fn1 \_ : a . \fn1 \_ : b . c)} \to \fn1 \_ : {(a \lpair b)} . c$}, then $f$ and $g$ are inverses.
+	Given that we have $f \deq \code{split}$, and $g \deq {\code{uncurry}}^1 (\mcombine)$\footnote{Given that we have ${\indent uncurry}^1 : {(\oldfn1 \_ : a . \oldfn1 \_ : b . c)} \to \oldfn1 \_ : {(a \lpair b)} . c$}, then $f$ and $g$ are inverses.
 \end{lemma}
 \begin{proof}
-	The type of $f$ is $\fn1 \_ : {\tm {(m + n)} t w} . {{\tm m t w} \lpair {\tm n t w}}$, and that of $g$ is $\fn1 \_ : {{\tm m t w} \lpair {\tm n t w}} . \tm {(m + n)} t w$, so there composition $f \circ g : \fn1 - : {\tm {(m + n)} t w} . \tm {(m + n)} t w$ (the same for $g \circ f$).
+	The type of $f$ is $\oldfn1 \_ : {\tm {(m + n)} t w} . {{\tm m t w} \lpair {\tm n t w}}$, and that of $g$ is $\oldfn1 \_ : {{\tm m t w} \lpair {\tm n t w}} . \tm {(m + n)} t w$, so there composition $f \circ g : \oldfn1 - : {\tm {(m + n)} t w} . \tm {(m + n)} t w$ (the same for $g \circ f$).
 	Any function from a unique object and that same unique object is an identity, thereby these are inverses \needcite
 \end{proof}
 
@@ -223,46 +225,50 @@ Another relevant construction is multiplicity ``joining'' and its inverse, multi
 	\end{math} 
 \end{definition}
 
+This is equivalent to flattening of values, and bears the same name as the equivalent monadic operation, \code{join}.
+Just like \mcombine had the inverse \code{split}, \code{join} has the inverse \code{expand}
 \subsection{Applications over $M$}
 
 There is still one crucial operation that we have not yet mentioned, and that is application over $M$.
 That is, we want a way to be able to lift a linear function into $M$.
 We can do this, and we call it \code{map}, due to its similarity to functorial lifting and its definition may be found \ref{lst:def_map}.
 
-\begin{listing}
-	\begin{minted}{idris}
-		map : (f : t -@ u) -> Mu n t w -@ Mu n u (f w)
-		map f MZ = MZ
-		map f (MS x xs) = MS (f x) (map {w=x} f xs)
-	\end{minted}
-	\caption{Definition of \code{map}in Idris}
-	\label{lst:def_map}
-\end{listing}
 
 However, there is something unsatisfying about \code{map}.
 Namely, the first arguement is unrestricted.
 However, we \emph{know} exactly how many of the function we need.
 It will simply be the same as the number of arguements.
 
-So, we define another function, \code{app}, which has the type $\code{app}: \fn1 f : {\tm n {(\fn1 \_ : t . u)} {w_f}} . \fn1 x : {\tm n t {w_x}} . {\tm n u {(w_f w_x)}}$, and a defintion given at \ref{lst:def_app}
+So, we define another function, \code{app}, which has the type $\code{app}: \oldfn1 f : {\tm n {(\oldfn1 \_ : t . u)} {w_f}} . \oldfn1 x : {\tm n t {w_x}} . {\tm n u {(w_f w_x)}}$, and a defintion given at \ref{lst:def_app}
 
 \begin{listing}
-	\begin{minted}{idris}
-		app : Mu n (t -@ u) wf -> Mu n t wx -@ Mu n u (wf wx)
-		app MZ MZ = MZ 
-		app (MS f fs) (MS x xs) = MS (f x) (app fs xs)
-	\end{minted}
-	\caption{Definition of \code{app}}
+	\begin{multicols}{2}
+		\begin{minted}{idris}
+			app : Mu n (t -@ u) wf -> Mu n t wx -@ Mu n u (wf wx)
+			app MZ MZ = MZ 
+			app (MS f fs) (MS x xs) = MS (f x) (app fs xs)
+		\end{minted}
+		\columnbreak
+		\begin{minted}{idris}
+			map : (f : t -@ u) -> Mu n t w -@ Mu n u (f w)
+			map f MZ = MZ
+			map f (MS x xs) = MS (f x) (map {w=x} f xs)
+		\end{minted}
+	\end{multicols}
+	\caption{Definition of \code{map} and \code{app}}
+	\label{lst:def_map}
 	\label{lst:def_app}
 \end{listing}
 
-Notably, if we define a function $\code{genMu}: \fn1 x : {!_* t} . \fa1 n : \nat . {\tm n t x.{\code{unrestricted}}}$, which is simply defined as $\code{genMu}(\code{MkBang}\_) 0 \deq \mz$ and $\code{genMu}(\code{MkBang}x) (S n) \deq (x \ms (\code{genMu}n (\code{MkBang}x)))$, we can define \code{map}as $\code{map}\{n\} f x \deq \code{app}(\code{genMu}f n) x$ \todo{This isn't exactly correct}.
+Notably, if we define a function $\code{genMu}: \oldfn1 x : {!_* t} . \oldfa1 n : \nat . {\tm n t x.{\code{unrestricted}}}$, which is simply defined as $\code{genMu}(\code{MkBang}\_) 0 \deq \mz$ and $\code{genMu}(\code{MkBang}x) (S n) \deq (x \ms (\code{genMu}n (\code{MkBang}x)))$, we can define \code{map}as $\code{map}\{n\} f x \deq \code{app}(\code{genMu}f n) x$ \todo{This isn't exactly correct}.
 
 \subsection{Applicative $M$}
 
 We can use \code{app} to derive equivalents of the \code{push} and \code{pull} methods of \granule, in a similar way to how we can use \code{<*>} to define mappings over pairs.
-In Idris, we define $\code{push} : \fn1 \_ : \tm n {(\sg1 \_ : t . u)} {(\tp1 \_ : w_0 . w_1)} . \sg1 \_ : \tm n t w_0 . \tm n u w_1$ and $\code{pull} : \fn1 \_ : {\sg1 \_ : \tm n t w_0 . \tm n u w_1} . \tm n {(\sg1 \_ : t . u)} {(\tp1 \_ : w_0 . w_1)}$.
+In Idris, we define $\code{push} : \oldfn1 \_ : \tm n {(\oldsg1 \_ : t . u)} {(\tp1 \_ : w_0 . w_1)} . \oldsg1 \_ : \tm n t w_0 . \tm n u w_1$ and $\code{pull} : \oldfn1 \_ : {\oldsg1 \_ : \tm n t w_0 . \tm n u w_1} . \tm n {(\oldsg1 \_ : t . u)} {(\tp1 \_ : w_0 . w_1)}$.
 Their construction is simple, and may be found in \thislib.
 
-One of the more important constructions, particularly for \ref{sec:omega_types}, is that of \ident react .
-\ident react , which borrows its name from the notion of ``statements as chemicals''
+%%% Local Variables:
+%%% mode: LaTeX
+%%% TeX-master: "../main"
+%%% End:

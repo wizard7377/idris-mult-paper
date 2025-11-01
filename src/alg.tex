@@ -1,0 +1,156 @@
+\section{Resource Algebras as Types}
+
+In the languages of Flix, Koka, and others, the type system is enriched with an effect algebra \cite{flix_paper,koka_1}. 
+In a similar vein, Granule (and Idris to a much more limited extent) use a resource algebra to enrich the type system.
+In a language like Haskell however, there has been a question as to whether this can be embed into the language itself. 
+This is the goal of the libraries such as \code{fusted-effect} \needcite \todo{Check name}, which use the constraint and type polymorphism to form a limited algebra.
+
+In Idris, we can do similar constructions. 
+However, it remains a question as to whether we can construct a type of resource algbebras to enrich Idris types with multiplicitity polymorphism 
+
+Here, we propose a ``simple'' system of effect formulas that model functions on natural numbers.
+We view each possible multiplicity as a ``member of'' solution set.
+So, for instance, to get all possible multiplicities of two, we would use the model of $\lambda x . 2 * x$. 
+
+The problem with this, however, is that solving functions themselves are not decidable.
+
+\subsection{Formula Types} 
+So, we create a ``restricted'' effect formula type, called \ident Form which represents a function from natural numbers to natural numbers.
+We formalize this notion of ``modeling a given function'' by defining a function $\code{Eval} :_0 \fn{\ident Form }{\fn{\nat}{\nat}}$.
+This is the core means through which we interpret a given formula. 
+
+In addition, we have two further procedures, $\code{Solve} \phi x$. Its definition is $\ident Solve f y \deq_0 (\code{Exists} \nat (\lambda x . (\code{Eval} f x \peq y)))$.
+We further define $\ident Unify \phi \psi$, which takes in two formulas and retursn a type, and is defined as $\fa[y]{\nat}{\fn{y \in \phi}{y \in \psi}}$
+
+\begin{note}
+	We write $\ident Solve \phi x$ as $x \in \phi$ and $\ident Unify \phi \psi$ as $\phi \subform \psi$
+\end{note}
+Intuitively, $y \in \phi$ is ``$\phi$ can output $x$, and $\phi \subform \psi$ is that if $y$ is a solution of $\phi$ it is also a solution of $\psi$ \cite{granule}.
+
+Note that $\subform$ forms a pre-order on $\ident Form $, that is, it is transitive and reflexive.
+
+\begin{lemma}
+	$\subform$ is reflexive, that is, $\fa[\phi]{\vform}{\phi \subform \phi}$
+\end{lemma}
+
+\begin{proof}
+	Upon expansion, the result type becomes $\fa[y]{\nat}{\fn{\veval \phi y}{\veval \phi y}}$, which is just identity 
+\end{proof}
+
+\begin{lemma}
+	$\subform$ is transitive, that is, $\fa[\phi_0]{\vform}{\fa[\phi_1]{\vform}{\fa[\phi_2]{\vform}{\fn{\phi_0 \subform \phi_1}{\phi_1 \subform \phi_2}}}}$
+\end{lemma}
+\begin{proof}
+	\todo{Proof}
+\end{proof}
+\subsection{The Simple Forms}
+
+The most basic constructor of the \ident Form type is that of \ident FVar , which is a nullary constructor of \ident Form . 
+It models the ``arguement'' in a given formula, and its clause of \ident Eval is $\ident Eval \ident FVar x \deq x$.
+
+Note that $\ident FVar $ is more general than any other formula, as every single natural number is mapped to, so we have $\phi \subform \ident FVar $ for each formula $\phi$ \todo{Add proof of this}
+
+Next up we have nearly as simple of a constructor, \ident FLit . 
+It is a unary constructor taking a natural number, which is essientally the ``constant'' formula. 
+Its branch of \ident Eval is $\veval (\ident FLit k ) x \deq k$, that is, it ignores its arguement. 
+
+% END OF SET D
+% START OF SET E
+
+\subsection{Binary Operations}
+
+We introduce four constructors of \vform, all of which are quite similar, all taking in two sub-formulas as arguemetns to the constructors, and all model binary operations. 
+
+They are \ident FAdd (addition), \ident FMul (multiplication), \ident FMax (joins), \ident FMin (meets). 
+The first two of these are sufficent to define \ident Form as an instance of the Idris \ident Num class, with the conversion being \ident FLit , addition as \ident FAdd and multiplication as \ident FMul .
+
+We then define the evaluation of all of these.
+Using \code{FAdd} as an example, we have $\veval (\ident FAdd f g ) x \deq (\veval f x) + (\veval g x)$, and we omit here the rest of the operators because they are quite similar.
+
+The only notable fact about such of these is that they both use the same variable for both of the formulas, so $\ident FAdd \ident FVar \ident FVar $ is a formula which the same variable is used twice.
+every instance of $\code{FVar}$ in $\phi$ with $\phi$ 
+%2
+
+\subsection{The Extensions}
+
+While so far we have defined \ident Form to be a rig (ring sans negation), the rest of these forms all do something fairly unique.
+First among these is \ident FApp , which is a binary constructor of a \ident Form . 
+Very roughly, $\ident FApp \phi \psi$ represents the ``composition'' of the formulas.
+While this sounds complex, it is in praticed quite simple, with us defining the \ident Eval branch as $\veval (\ident FApp \phi \psi) x \deq \veval \phi (\veval \psi x)$. 
+
+Apart from being viewed as a composition, we can also view $\ident FApp \phi \psi$ as the result of substituting 
+
+\begin{lemma}
+	\code{FVar} is the identity formula with respect to \code{FApp}
+\end{lemma} 
+\begin{proof}
+	\todo{Proof}
+\end{proof}
+
+We also note compostions always are subformulas of their second formula
+
+\begin{theorem}
+	For any formulas $\phi$ $\psi$, $\code{FApp} \phi \psi$ is at most general as $\phi$
+\end{theorem}
+\begin{proof}
+	\todo{Proof}
+\end{proof}
+
+\subsection{Completeness of Natural Numbers}
+
+There are two much more out of place constructors, \code{FLeft} and \code{FRight}, both of which are unary constructors on \code{Form}.
+These constructors have a seemingly random definition, but have a very important for allowing polyvariadic formulas.
+
+Firstly, we define a function, \code{pairing}, which has the form $\fn_1 {\nat}{\nat \times \nat}$ it is defined as follows:
+\begin{itemize}
+	\item \code{pairing} 0 is $(0, 0)$
+	\item If $n$ is not of the prime factorization form $2^x 3^y$, then it is equal to $(0, 0)$
+	\item If, for some $x, y : \nat$, it is of the form $2^x 3^y$, then it is equal to $(x, y)$
+\end{itemize}
+
+\begin{corollary}
+	For all $x, y : \nat$, $\code{pairing} (2^x 3^y) \peq (x, y)$
+\end{corollary}
+\begin{proof}
+	\todo{Finish}
+\end{proof}
+
+\todo{Finish this section}
+
+\begin{listing}
+	\begin{multicols}{2}
+		\begin{minted}{idris}
+			data Form : Type where 
+			FVar : Form 
+			FVal : (1 n : QNat) -> Form 
+			FApp : (1 g : Form) -> (1 f : Form) -> Form
+			FAdd : (1 x : Form) -> (1 y : Form) -> Form
+			FMul : (1 x : Form) -> (1 y : Form) -> Form
+			FMin : (1 x : Form) -> (1 y : Form) -> Form
+			FMax : (1 x : Form) -> (1 y : Form) -> Form
+			FLeft : (1 f : Form) -> Form
+			FRight : (1 f : Form) -> Form
+		\end{minted}
+		
+		\begin{minted}{idris}
+			0 Eval : (1 f : Form) -> (1 x : QNat) -> QNat
+			Eval FVar x = x
+			Eval (FVal n) x = n
+			Eval (FApp g f) x = Eval g (Eval f x)
+			Eval (FAdd f g) x = ladd (Eval f x) (Eval g x)
+			Eval (FMul f g) x = lmul (Eval f x) (Eval g x)
+			Eval (FMin f g) x = lmin (Eval f x) (Eval g x)
+			Eval (FMax f g) x = lmax (Eval f x) (Eval g x)
+			Eval (FLeft f) x = let 
+				(y # z) = pairing x 
+				in Eval f y
+			Eval (FRight f) x = let 
+				(y # z) = pairing x 
+				in Eval f z
+		\end{minted}
+	\end{multicols}
+	
+	\caption{The definition of formulas and evaluation in \thislib}
+	\label{lst:form_def}
+\end{listing}
+
