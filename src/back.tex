@@ -5,5 +5,13 @@ Among these are the linear natural numbers, cloning and dropping, as well as exi
 
 \subsection{Linear Natural Numbers}
 
-While linear values are quite useful in of themselves, they have one very large problem, 
+While linear values are quite useful in of themselves, they have one very large problem,
+
+\subsection{Existential Types}
+
+Existential types, in regards to dependent types, usually refers to dependent pair ($\Sigma$) types \cite{hottbook}.
+In this context, we see the first element of the pair as ``evidence'' for the type of the second element of the pair.
+In Idris, this is formalized (in \idris's \citetitle{idris_base}) by stating that the first arguement is runtime erased, in a similar way to which universal quantifiaction is a function that is erased.
+
+However, for our usage here this is not suitaible, as 
 
