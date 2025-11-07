@@ -1,14 +1,14 @@
 \section{Exponential and Existential Types}
 
-While the $M$ and $\Omega$ types bear much intrest theoretically, they, by themselves, have little practical use.
-This is because as demonstrated in \ref{sec:grade_mu}, these types model the \emph{judgements} about graded modalities, not the graded modalities themselves.
+While the $M$ and $\Omega$ types bear much insert theoretically, they, by themselves, have little practical use.
+This is because as demonstrated in \ref{sec:grade_mu}, these types model the \emph{judgments} about graded modalities, not the graded modalities themselves.
 
 Fortunately, however, we can define a simple abstraction over them that allows them to behave more like true graded modalities at the term level.
 To do this, we must first introduce a linear existential type.
-A regular existential type is a dependent pair type that "dosen't care" about its first argument. 
-In Idris 2, we can make the that fact part of the programming by giving the first arguement a multiplicity of zero.
+A regular existential type is a dependent pair type that "doesn't care" about its first argument. 
+In Idris 2, we can make the that fact part of the programming by giving the first argument a multiplicity of zero.
 
-Idris 2 actually defines an existential type, however, it has the second arguement have a multiplicity of $\omega$, while we want it to have a multiplicity one.
+Idris 2 actually defines an existential type, however, it has the second argument have a multiplicity of $\omega$, while we want it to have a multiplicity one.
 Fortunately, the modification of \ident Exists to our type, \ident LExists , is quite trivial\footnote{Idris, however, seems to have trouble correctly linearlizing constructor accessors, so we define the actual \ident fst and \ident snd accessors separately}, and we define it in \ref{lst:def_lexists}
 
 \begin{listing}
@@ -41,3 +41,8 @@ We can also define mapping like how Idris defines the mapping, with the signatur
 \subsection{Existential Crisis (Solution)}
 
 This principle issue with using $M$ and $\Omega$ in practice is that
+
+%%% Local Variables:
+%%% mode: LaTeX
+%%% TeX-master: "../main"
+%%% End:

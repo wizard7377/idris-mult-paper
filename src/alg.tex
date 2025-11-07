@@ -6,7 +6,7 @@ In a language like Haskell however, there has been a question as to whether this
 This is the goal of the libraries such as \code{fusted-effect} \needcite \todo{Check name}, which use the constraint and type polymorphism to form a limited algebra.
 
 In Idris, we can do similar constructions. 
-However, it remains a question as to whether we can construct a type of resource algbebras to enrich Idris types with multiplicitity polymorphism 
+However, it remains a question as to whether we can construct a type of resource algebras to enrich Idris types with multiplicity polymorphism 
 
 Here, we propose a ``simple'' system of effect formulas that model functions on natural numbers.
 We view each possible multiplicity as a ``member of'' solution set.
@@ -20,7 +20,7 @@ We formalize this notion of ``modeling a given function'' by defining a function
 This is the core means through which we interpret a given formula. 
 
 In addition, we have two further procedures, $\code{Solve} \phi x$. Its definition is $\ident Solve f y \deq_0 (\code{Exists} \nat (\lambda x . (\code{Eval} f x \peq y)))$.
-We further define $\ident Unify \phi \psi$, which takes in two formulas and retursn a type, and is defined as $\fa[y]{\nat}{\fn{y \in \phi}{y \in \psi}}$
+We further define $\ident Unify \phi \psi$, which takes in two formulas and returns a type, and is defined as $\fa[y]{\nat}{\fn{y \in \phi}{y \in \psi}}$
 
 \begin{note}
 	We write $\ident Solve \phi x$ as $x \in \phi$ and $\ident Unify \phi \psi$ as $\phi \subform \psi$
@@ -46,23 +46,23 @@ Note that $\subform$ forms a pre-order on $\ident Form $, that is, it is transit
 \subsection{The Simple Forms}
 
 The most basic constructor of the \ident Form type is that of \ident FVar , which is a nullary constructor of \ident Form . 
-It models the ``arguement'' in a given formula, and its clause of \ident Eval is $\ident Eval \ident FVar x \deq x$.
+It models the ``argument'' in a given formula, and its clause of \ident Eval is $\ident Eval \ident FVar x \deq x$.
 
 Note that $\ident FVar $ is more general than any other formula, as every single natural number is mapped to, so we have $\phi \subform \ident FVar $ for each formula $\phi$ \todo{Add proof of this}
 
 Next up we have nearly as simple of a constructor, \ident FLit . 
-It is a unary constructor taking a natural number, which is essientally the ``constant'' formula. 
-Its branch of \ident Eval is $\veval (\ident FLit k ) x \deq k$, that is, it ignores its arguement. 
+It is a unary constructor taking a natural number, which is essentially the ``constant'' formula. 
+Its branch of \ident Eval is $\veval (\ident FLit k ) x \deq k$, that is, it ignores its argument. 
 
 % END OF SET D
 % START OF SET E
 
 \subsection{Binary Operations}
 
-We introduce four constructors of \vform, all of which are quite similar, all taking in two sub-formulas as arguemetns to the constructors, and all model binary operations. 
+We introduce four constructors of \vform, all of which are quite similar, all taking in two sub-formulas as agreements to the constructors, and all model binary operations. 
 
 They are \ident FAdd (addition), \ident FMul (multiplication), \ident FMax (joins), \ident FMin (meets). 
-The first two of these are sufficent to define \ident Form as an instance of the Idris \ident Num class, with the conversion being \ident FLit , addition as \ident FAdd and multiplication as \ident FMul .
+The first two of these are sufficient to define \ident Form as an instance of the Idris \ident Num class, with the conversion being \ident FLit , addition as \ident FAdd and multiplication as \ident FMul .
 
 We then define the evaluation of all of these.
 Using \code{FAdd} as an example, we have $\veval (\ident FAdd f g ) x \deq (\veval f x) + (\veval g x)$, and we omit here the rest of the operators because they are quite similar.
@@ -76,7 +76,7 @@ every instance of $\code{FVar}$ in $\phi$ with $\phi$
 While so far we have defined \ident Form to be a rig (ring sans negation), the rest of these forms all do something fairly unique.
 First among these is \ident FApp , which is a binary constructor of a \ident Form . 
 Very roughly, $\ident FApp \phi \psi$ represents the ``composition'' of the formulas.
-While this sounds complex, it is in praticed quite simple, with us defining the \ident Eval branch as $\veval (\ident FApp \phi \psi) x \deq \veval \phi (\veval \psi x)$. 
+While this sounds complex, it is in practiced quite simple, with us defining the \ident Eval branch as $\veval (\ident FApp \phi \psi) x \deq \veval \phi (\veval \psi x)$. 
 
 Apart from being viewed as a composition, we can also view $\ident FApp \phi \psi$ as the result of substituting 
 
@@ -87,7 +87,7 @@ Apart from being viewed as a composition, we can also view $\ident FApp \phi \ps
 	\todo{Proof}
 \end{proof}
 
-We also note compostions always are subformulas of their second formula
+We also note compositions always are subformulas of their second formula
 
 \begin{theorem}
 	For any formulas $\phi$ $\psi$, $\code{FApp} \phi \psi$ is at most general as $\phi$
@@ -154,3 +154,8 @@ Firstly, we define a function, \code{pairing}, which has the form $\fn_1 {\nat}{
 	\label{lst:form_def}
 \end{listing}
 
+
+%%% Local Variables:
+%%% mode: LaTeX
+%%% TeX-master: "../main"
+%%% End:

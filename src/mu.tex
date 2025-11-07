@@ -1,4 +1,4 @@
-\section{$\tmu$ types}
+\section{Mu types}
 
 The core construction here is $M$, or, in Idris, \code{Mu}, type.
 This is made to model a ``source'' of a given value.
@@ -17,7 +17,7 @@ In addition, $M$ has two constructors
 \end{definition}
 
 Firstly, it should be noted that the names were chosen due to the fact that the indices of them are related. 
-That is, $\mz$  or ``mu zero'' will always be indexed by $0$, and $\ms$, ``mu successor'', is always indexed by the succesor of whatever is given in.
+That is, $\mz$  or ``mu zero'' will always be indexed by $0$, and $\ms$, ``mu successor'', is always indexed by the successor of whatever is given in.
 
 \begin{listing}
 	\begin{minted}{idris}
@@ -87,7 +87,7 @@ This is equivalent to the statement ``there exists at most one $M$'' \needcite.
 	\begin{itemize}
 		\item The first case, where \sigil x and \sigil y are both $\tm 0 t w$, is trivial because, as per \ref{remark:only_zero} they both must be $\mz$
 		\item The inductive case, where, from the fact that for any $a$ and $b$ (both of $\tm n' t w$) we have $a \peq b$, we prove that we have, for \sigil x and \sigil y of $\tm {(S n')} t w$ that $x \peq y$.
-		We note that we can destruct both of these, with $x_1 : \tm n' t w$ and $y_1 : \tm n' t w$, into $x = x_0 \ms x_1$ and $y = y_0 \ms y_1$, where we note that both $x_0$ and $y_0$ must be equal to \sigil w, and then we just have the induction hypthesis, $x_1 \peq y_1$
+		We note that we can destruct both of these, with $x_1 : \tm n' t w$ and $y_1 : \tm n' t w$, into $x = x_0 \ms x_1$ and $y = y_0 \ms y_1$, where we note that both $x_0$ and $y_0$ must be equal to \sigil w, and then we just have the induction hypothesis, $x_1 \peq y_1$
 	\end{itemize}
 	
 	We thereby can simply this to the fact that $\tm n' t w$ has the above property, which is the induction hypothesis.
@@ -112,26 +112,26 @@ This is equivalent to the statement ``there exists at most one $M$'' \needcite.
 
 \todo[cleanup]{Finish proof}
 
-However, we can make a even more specific statement, given the fact we know that $w$ is an inhabitent of $t$.
+However, we can make a even more specific statement, given the fact we know that $w$ is an inhabitant of $t$.
 \begin{theorem}[Uniqueness]
 	\label{thm:unique}
-	If $\tm n t w$ is well formed, then it must have \emph{exactly} one inhabitent.
+	If $\tm n t w$ is well formed, then it must have \emph{exactly} one inhabitant.
 \end{theorem}
 \begin{proof}
-	We know by \ref{lem:all_eq} that there is \emph{at most} one inhabitent of $\tm n t w$. 
-	We then induct on $n$ to show that there must also exist \emph{at least} one inhabitent of the type.
+	We know by \ref{lem:all_eq} that there is \emph{at most} one inhabitant of $\tm n t w$. 
+	We then induct on $n$ to show that there must also exist \emph{at least} one inhabitant of the type.
 	\begin{itemize}
 		\item The first case is that $\tm 0 t w$ is always constructible, which is trivial, as this is just $\mz$.
 		\item The second case, that $\tm n' t w$ provides $\tm {(S n')} t w$ being constructible is also trivial, namely, if we have the construction on $\tm n' t w$ as $x$, we \emph{know} that the provided value must be \sigil w.
 	\end{itemize}
 	
-	Given that we can prove that there must be at least and at most one inhabitent, we can prove that there is exactly one inhabitent.
+	Given that we can prove that there must be at least and at most one inhabitant, we can prove that there is exactly one inhabitant.
 \end{proof}
 
 This is very important for proofs on $M$.
 It corresponds to the fact that there is only one way to copy something, to provide another value that is the exact same as the first.
 
-\subsection{Graded Modalities With $M$}
+\subsection{Graded Modalities With Mu}
 
 \label{sec:grade_mu}
 A claim was made earlier that $M$ types can be used to model graded modalities within QTT.
@@ -168,12 +168,12 @@ Unfortunately, there is no way to prove this in either language, as $M$ can't be
 	\caption{The meta-logical \code{drop} rule and its Idris 2 equivalent}
 \end{figure}
 
-\subsection{Operations on $M$}
+\subsection{Operations on Mu}
 
 There are number of operations that are very important on $M$.
 The first of these that we will discuss is combination.
-We define this as $\mcombine : \oldfn1 \_ : {\tm m t w} . \oldfn1 \_ : {\tm n t w} . \tm {(m + n)} t w$\missingcode, and we define it inductivly as $\ms \mcombine x \deq x$, and $(a \ms b) \mcombine x \deq a \ms (b \mcombine x)$.
-Note the similarity between the natural number indicies and the values, where $0 + x \deq x$ and $(S n) + x \deq S (n + x)$
+We define this as $\mcombine : \oldfn1 \_ : {\tm m t w} . \oldfn1 \_ : {\tm n t w} . \tm {(m + n)} t w$\missingcode, and we define it inductively as $\ms \mcombine x \deq x$, and $(a \ms b) \mcombine x \deq a \ms (b \mcombine x)$.
+Note the similarity between the natural number indices and the values, where $0 + x \deq x$ and $(S n) + x \deq S (n + x)$
 
 \todo[cleanup]{Fix the alignement of these}
 \begin{figure}
@@ -227,7 +227,7 @@ Another relevant construction is multiplicity ``joining'' and its inverse, multi
 
 This is equivalent to flattening of values, and bears the same name as the equivalent monadic operation, \code{join}.
 Just like \mcombine had the inverse \code{split}, \code{join} has the inverse \code{expand}
-\subsection{Applications over $M$}
+\subsection{Applications over Mu}
 
 There is still one crucial operation that we have not yet mentioned, and that is application over $M$.
 That is, we want a way to be able to lift a linear function into $M$.
@@ -235,11 +235,11 @@ We can do this, and we call it \code{map}, due to its similarity to functorial l
 
 
 However, there is something unsatisfying about \code{map}.
-Namely, the first arguement is unrestricted.
+Namely, the first argument is unrestricted.
 However, we \emph{know} exactly how many of the function we need.
-It will simply be the same as the number of arguements.
+It will simply be the same as the number of arguments.
 
-So, we define another function, \code{app}, which has the type $\code{app}: \oldfn1 f : {\tm n {(\oldfn1 \_ : t . u)} {w_f}} . \oldfn1 x : {\tm n t {w_x}} . {\tm n u {(w_f w_x)}}$, and a defintion given at \ref{lst:def_app}
+So, we define another function, \code{app}, which has the type $\code{app}: \oldfn1 f : {\tm n {(\oldfn1 \_ : t . u)} {w_f}} . \oldfn1 x : {\tm n t {w_x}} . {\tm n u {(w_f w_x)}}$, and a definition given at \ref{lst:def_app}
 
 \begin{listing}
 	\begin{multicols}{2}
@@ -262,7 +262,7 @@ So, we define another function, \code{app}, which has the type $\code{app}: \old
 
 Notably, if we define a function $\code{genMu}: \oldfn1 x : {!_* t} . \oldfa1 n : \nat . {\tm n t x.{\code{unrestricted}}}$, which is simply defined as $\code{genMu}(\code{MkBang}\_) 0 \deq \mz$ and $\code{genMu}(\code{MkBang}x) (S n) \deq (x \ms (\code{genMu}n (\code{MkBang}x)))$, we can define \code{map}as $\code{map}\{n\} f x \deq \code{app}(\code{genMu}f n) x$ \todo{This isn't exactly correct}.
 
-\subsection{Applicative $M$}
+\subsection{Applicative Mu}
 
 We can use \code{app} to derive equivalents of the \code{push} and \code{pull} methods of \granule, in a similar way to how we can use \code{<*>} to define mappings over pairs.
 In Idris, we define $\code{push} : \oldfn1 \_ : \tm n {(\oldsg1 \_ : t . u)} {(\tp1 \_ : w_0 . w_1)} . \oldsg1 \_ : \tm n t w_0 . \tm n u w_1$ and $\code{pull} : \oldfn1 \_ : {\oldsg1 \_ : \tm n t w_0 . \tm n u w_1} . \tm n {(\oldsg1 \_ : t . u)} {(\tp1 \_ : w_0 . w_1)}$.

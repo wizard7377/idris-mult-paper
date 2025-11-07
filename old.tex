@@ -1,0 +1,19 @@
+\long\def\oldfn#1 #2 :#3.#4 {{\ensuremath{%
+			\ifstrequal{#2}{\_}{#3}{(#2 : #3)}%
+			\ifstrequal{#1}{*}{\to}{\to_{#1}}% 
+			#4%
+}}}
+
+
+\def\oldfa#1#2 :#3.#4 {{\ensuremath{%
+			\forall\ifstrequal{#2}{\_}{#3}{(#2 : #3)}% 
+			\ifstrequal{#1}{*}{\to}{\to_{#1}} #4%
+}}}
+\def\oldafa#1#2 :#3.#4 {{\ensuremath{%
+			\forall\ifstrequal{#2}{\_}{#3}{(#2 : #3)}% 
+			\ifstrequal{#1}{*}{\Rightarrow}{\Rightarrow_{#1}} #4%
+}}}
+\def\oldsg#1 #2 :#3.#4 {{\ensuremath{%
+			\ifstrequal{#2}{\_}{#3}{(#2 : #3)}% 
+			\ifstrequal{#1}{*}{\times}{\times_{#1}} #4%
+}}}
