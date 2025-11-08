@@ -23,11 +23,11 @@ That is, $\mz$  or ``mu zero'' will always be indexed by $0$, and $\ms$, ``mu su
 	\begin{minted}{idris}
 		data Mu : (n : Nat) -> (t : Type) -> (w : t) -> Type where
 			MZ : 
-				Mu Z t w
+				Mu 0 t w
 			MS : 
 				(1 w : t) -> 
-				(1 xs : (Mu n t w)) -> 
-				Mu (S n) t w
+				(1 xs : Inf (Mu n t w)) -> 
+				Mu (QSucc n) t w
 	\end{minted}
 	\caption{The definition of $M$ in Idris}
 	\label{lst:mu_def}
@@ -267,6 +267,21 @@ Notably, if we define a function $\code{genMu}: \oldfn1 x : {!_* t} . \oldfa1 n 
 We can use \code{app} to derive equivalents of the \code{push} and \code{pull} methods of \granule, in a similar way to how we can use \code{<*>} to define mappings over pairs.
 In Idris, we define $\code{push} : \oldfn1 \_ : \tm n {(\oldsg1 \_ : t . u)} {(\tp1 \_ : w_0 . w_1)} . \oldsg1 \_ : \tm n t w_0 . \tm n u w_1$ and $\code{pull} : \oldfn1 \_ : {\oldsg1 \_ : \tm n t w_0 . \tm n u w_1} . \tm n {(\oldsg1 \_ : t . u)} {(\tp1 \_ : w_0 . w_1)}$.
 Their construction is simple, and may be found in \thislib.
+
+\subsection{Infinite Mu}
+\label{sec:inf_mu}
+
+We noted before that \tm{} is defined not by the linear natural numbers but by the linear conatural numbers.
+This is as in \needcite{}, where the conatural numbers are used to model infinite ``sources'' of a specific value.
+
+This gives $M$ a very special distinction, it is either a inductive datatype or coinductive datatype, but in either case uses the constructor $\ms$.
+This is because of the dual nature of conatural numbers, they consist of a finite portion and a infinite fixpoint, and because we build $M$ on top of them, we then havea  duality in how we construct $M$.
+
+Fourtanetly, we can include a \code{Inf} annotation on the inductive portion of $M$ and the compiler will allow it even when $M$ is actually acting as a regular datatype.
+While at first it seems like $M \cofix$ would not be that useful, it is actually quite useful for one very particular reason: we can use it, combined with the \tomega{} construction, to create a model for Girard's ``of course'' construct.
+
+It therein makes sense that we should be able to define a pair of functions, one to $\tm \cofix t w$ from $!_* t$ and another going in the opposite direction.
+Unfourtantly, Idris does not in general have a mechanism for combining infinitely many of the same value into one \omega{} binding, so only the second of these, $\code{gen} : \fn1 {!_* t}{\tm \cofix t w}$, exists, and we have already essientally seen it, so we do not write it out explicitly here
 
 %%% Local Variables:
 %%% mode: LaTeX

@@ -27,6 +27,25 @@ The first of these is the unrestricted ``runtime'' version of it, and its defini
 The second of these is the erased ``reflectable'' version of it, who's definition follows the usual structure for natural numbers, and is much easier to infer about.
 We then define an assumption \code{mulRep} which is of the form $\code{lmul} \peq \code{lmul'}$, and thereby can prove things about \code{lmul} through simpler proofs on \code{lmul'}
 
+\section{Conatural numbers}
+\label{sec:conat}
+
+The conatural numbers are the natural numbers, \nat{}, extended with a fixpoint, $\infty$ \cite{dependent_linear}.
+
+\begin{definition}
+  The conatural numbers, $\conat$, have two constructors, $\cofix : \conat$, and $\cofin : \fn_1{\nat}{\conat}$ written in Idris as \code{Fix} and \code{Fin}, respectivly
+\end{definition}
+
+Note that \cofix{} is a simple constructor of \conat, it is not special in any way, as opposed to the definition usually given in Rocq, which usually defines conatural numbers as merely a the natural numbers with some postulated ``fixpoint'' at some value.
+Granted, this makes conatural numbers in Rocq fairly easy to deal with, \conat{} tends to be rather difficult to work with, but we gain concreteness in exchange.
+
+Often, we desire to talk about the ``successors'' of a given value.
+We define the successor, \cosuc{n}, as, for any finite value, its finite successor, and for \cofix{}, simply as \cofix{}.
+This unfourtantly means that successors of values are not neccaisarlly distinct from themselves.
+Perhaps even more troubling is the fact that this means that \conat{} \emph{is not} well-founded.
+
+However, fourtanetly, by defining \code{Finite}, we can create a set of 
+
 \subsection{Existential Types}
 
 Existential types, in regards to dependent types, usually refers to dependent pair ($\Sigma$) types \cite{hottbook}.
