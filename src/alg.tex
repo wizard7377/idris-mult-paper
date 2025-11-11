@@ -19,7 +19,8 @@ We propose that this is indeed possible with a definition of \code{Form'} types.
 We will write $x \in \phi$ or $\phi \ni x$ for $\code{Solve'} \phi x$, and $\phi \subseteq \psi$ $\psi \supseteq \phi$ for $\code{Unify'} \phi \psi$. 
 Notably, this means that $\phi \subseteq \psi := \fa<1>[n]{\nat}{\fn{\phi \ni n}{\psi \ni n}}$.
 This allows us to consider formulas as ``sets'' of natural numbers, those being all their possible outputs. 
-We then say that a given number is ``in'' the formula if it is possible for it to be output, and a subset if every ``element'' is in the superset 
+We then say that a given number is ``in'' the formula if it is possible for it to be output, and a subset if every ``element'' is in the superset. 
+We define the interpretation of each constructor of \code{Form'} based off its branch of \code{Eval'}
 
 This means that \code{Form'} forms a category on $\subseteq$
 
@@ -27,7 +28,19 @@ This means that \code{Form'} forms a category on $\subseteq$
 
 \subsection{The Core Formulas}
 
+Out of six total constructors of formulas, four of them are binary constructors modeling addition, multiplication, joins and meets, while the other two model the basic notion of ``variable'' and ``constant'' in a formula.
 
+These last two we will discuss first.
+The first of these is \code{FVar'}, which has the type $\code{Form'} 1$. 
+It models the notion of a singular variable in the formula.
+It evaluates as $\code{Eval'} \code{FVar'} [x] \deq x$, notably, however, this is the only branch, as the only possible index that \code{FVar'} can produce is 1.
+
+Of all the formulas, \code{FVar'} is the most general. 
+That is to say, it is the terminal object in the category of \code{Form'}. 
+
+\todo{Need proof}
+
+The next of these, \code{FVal'}
 %%% Local Variables:
 %%% mode: LaTeX
 %%% TeX-master: "../main"
