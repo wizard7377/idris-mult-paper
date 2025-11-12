@@ -1,58 +1,66 @@
 \section{Background}
 
-There are a couple constructions we must first define before we discuss the results posited here, however.
-Among these are the linear natural numbers, cloning and dropping, as well as existential types
+\subsection{Copying and Dropping}
+\label{sec:copy_drop}
 
-\subsection{Linear Natural Numbers}
+Utlitmatly, one of the notable facts about a language like Rust with single use bindings is the notion of cloning, or copying, a value.
+Given that Rust's ownership system can be (partially) modeled by a linear type system, \needcite{}, it makes sense then that Idris' linear library has two interfaces, \code{Duplicable} and \code{Discardable}, which model duplication and droping of linear resources, respectivly.
 
-While linear values are quite useful in of themselves, they have one very large problem, the fact that reflection about them is limited.
-This is particarly problematic with linear natural numbers, which we define here as \ident QNat in \ref{lst:def_qnat}.
+However, a choice was made not use \code{Duplicable}, and its associated \code{Copies}, for a couple of reasons:
+
+\begin{itemize}
+\item It is hard to use in practice
+\item It relies heavily on \code{Copies}, which is quite similar to the main construction in this paper, mu types
+\end{itemize}
+
+For these reasons, we define a new interface, \code{Copy}, which has two methods, $\code{copy} : \fn<1>{(\fn<1>[x]{a} \fn<1>[y]{a} (p x y))} \fn<1>[z]{a} (p z z)$.
+This essientally ``uses a value twice'' in an arbitrary (potentially dependent) function, and an erased proof that $\code{copy} f z \peq f z z$.
+
+We also redefine a \code{Drop} interface that is just \code{Consumable} with a different name, though this is more a style choice than anything else.
+
+\subsection{Linear Functions on Numbers}
+
+While Idris' does have a linear library, there are a couple problems with the support for linear bindings:
+\begin{itemize}
+\item These are not as well developed as their unrestricted counterparts
+\item They can't be converted to their unrestricted counterparts
+\end{itemize}
+
+One of the best examples of this is the natural numbers.
+Clearly, for any binding of $2$, we expect that to be exactly one binding of $1$ inside a succesor function.
+However, this is not the case, rather, Idris by default has it so that data constructor arguements are unrestricted by default.
+This is very important for a case like the natural numbers, where this is taken to the extreme, it is almost always impossible to talk about the \code{Nat} datatype in a useful way with linear bindings.
+
+\paragraph{Natural Numbers}
+
+The solution to this, then, is to define the \emph{linear} natural numbers.
+While the linear library also defines \code{LNat}, we also don't use that, because of the fact that, again, it relies on the \code{Copies} construction, in addition to already not having that large of an implementation to begin with.
+Granted, our version is almost exactly the same, and is defined as follows:
+
 
 \begin{listing}
 	\begin{minted}{idris}
-		data QNat : Type where
-			Zero : QNat
-			Succ : (1 k : QNat) -> QNat
+        data QNat : Type where
+            Zero : QNat
+            Succ : (1 k : QNat) -> QNat
 	\end{minted}
-	\caption{The definition of \thislib's natural numbers}
+	\caption{Definition of linear natural numbers}
 	\label{lst:def_qnat}
 \end{listing}
 
-While addition is fine, once we get to multiplication we begin using one of the variables are variable amount of times. 
-The \citetitle{idris_linear} library solves this by using inference to essientally clone the first value. 
-Here, however, we opt for a different mechanism, that allows for easier reflection.
-Namely, we use the fact that erased functions are free to disregard multiplicities, and thence define a pair of multiplication functions, \code{lmul} and \code{lmul'}.
+The rest of the operations use a model as close to the simple inductive definitions as possible, using \code{copy} instead of the more complex \code{duplicate}.
 
-The first of these is the unrestricted ``runtime'' version of it, and its definition is \emph{not exported}.
-The second of these is the erased ``reflectable'' version of it, who's definition follows the usual structure for natural numbers, and is much easier to infer about.
-We then define an assumption \code{mulRep} which is of the form $\code{lmul} \peq \code{lmul'}$, and thereby can prove things about \code{lmul} through simpler proofs on \code{lmul'}
+\paragraph{Conatural Numbers}
 
-\section{Conatural numbers}
-\label{sec:conat}
-
-The conatural numbers are the natural numbers, \nat{}, extended with a fixpoint, $\infty$ \cite{dependent_linear}.
-
-\begin{definition}
-  The conatural numbers, $\conat$, have two constructors, $\cofix : \conat$, and $\cofin : \fn_1{\nat}{\conat}$ written in Idris as \code{Fix} and \code{Fin}, respectivly
-\end{definition}
-
-Note that \cofix{} is a simple constructor of \conat, it is not special in any way, as opposed to the definition usually given in Rocq, which usually defines conatural numbers as merely a the natural numbers with some postulated ``fixpoint'' at some value.
-Granted, this makes conatural numbers in Rocq fairly easy to deal with, \conat{} tends to be rather difficult to work with, but we gain concreteness in exchange.
-
-Often, we desire to talk about the ``successors'' of a given value.
-We define the successor, \cosuc{n}, as, for any finite value, its finite successor, and for \cofix{}, simply as \cofix{}.
-This unfourtantly means that successors of values are not neccaisarlly distinct from themselves.
-Perhaps even more troubling is the fact that this means that \conat{} \emph{is not} well-founded.
-
-However, fourtanetly, by defining \code{Finite}, we can create a set of 
+\todo{Finish this}
 
 \subsection{Existential Types}
 
-Existential types, in regards to dependent types, usually refers to dependent pair ($\Sigma$) types \cite{hottbook}.
+Existential types, regarding dependent types, usually refers to dependent pair ($\Sigma$) types \cite{hottbook}.
 In this context, we see the first element of the pair as ``evidence'' for the type of the second element of the pair.
-In Idris, this is formalized (in \idris's \citetitle{idris_base}) by stating that the first arguement is runtime erased, in a similar way to which universal quantifiaction is a function that is erased.
+In Idris, this is formalized (in \idris's \citetitle{idris_base}) by stating that the first argument is runtime erased, similarly to which universal quantification is a function that is erased.
 
-However, for our usage here this is not suitaible, as we are dealing with principally linear values, and \ident Exists is unrestricted.
+However, for our usage here this is not suitable, as we are dealing with principally linear values, and \ident Exists is unrestricted.
 Fourtanetly, however, the change from unrestricted to linear existentials is quite trivial, the construction of which may be found at \ref{lst:def_lexists1}
 
 \begin{listing}

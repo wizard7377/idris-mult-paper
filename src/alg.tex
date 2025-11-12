@@ -1,6 +1,6 @@
 \section{Resource Algebras as Types}
 
-In many programming languages, algebras are used as a suplement to the type system to model various concepts.
+In many programming languages, algebras are used as a supplement to the type system to model various concepts.
 Among these, Granule uses a resource algebra to model multiplicity \cite{quant_graded_modal}.
 However, a number of libraries in Haskell use the type system itself to model algebras \needcite{}.
 
@@ -40,7 +40,57 @@ That is to say, it is the terminal object in the category of \code{Form'}.
 
 \todo{Need proof}
 
-The next of these, \code{FVal'}
+The next of these, \code{FVal'}, models the notion of ``constants'' in formulas.
+It has the form $\code{FVal'} : \fn<1>{\nat}{\code{Form'} 0}$, and has the evaluation of $\code{Eval'} (\code{FVal'} n) [] \deq n$
+
+\subsection{The Binary Constructors }
+\label{sec:bin_cons}
+
+The remaining constructors of $\formp{n}$ all have the exact same form, that of $\fa<1>[a]{\nat} \fa<0>[b]{\nat} \fn<1>{\formp{a}} \fn<1>{\formp{b}} \formp{a + b}$.
+They are \code{FAdd'}, \code{FMul'} \code{FMax'}, \code{FMin'}, which model addition multiplication joins and meets.
+The branch of \evalp{FAdd' p q}{n} is as follows:
+
+\missingcode{}
+
+The other branches are defined similarly, simply switching out the operation of addition for whatever operation is appropriate.
+
+One of the important facts about all of these constructors is that they operate on two formulas \emph{Indepently}.
+That is, if $y \in \phi$ and $z \in \psi$, then it must also be true that $(y + z) \in (\code{FAdd'} \phi \psi)$, and similarly for all the others.
+So, we can reason about both parts of this completly independetly, which will be useful for creating a decision procedure of \code{Solve'}.
+
+\subsection{Abstract Forms}
+\label{sec:abstract_form}
+
+Almost all of the reasoning we do about \code{Form'} is about their outputs, but \emph{not} their inputs.
+Because of this, it would be useful to be able to define an abstract $\code{Form}$, that is nullarly and instead abstracts existentially over the \nat{} indice.
+We define it as \todo{Add def}
+
+\subsection{Decidability of Solutions}
+\label{sec:dec_solve}
+
+One of the most important properties of the algebra that we have defined here is that is provably decidable, that is, everything can be determined to be a solution of a formula or a contradiction of such by a terminating function.
+
+We prove each part individaully
+
+\begin{lemma}
+  \label{lem:solve_val}
+  $x \in \code{FVal'} n$ is decidable
+\end{lemma}
+\begin{proof}
+  This boils down to $\et<1>[y]{\nat} (x \peq n)$, and, as equiality of \nat{} is decidable, is itself decidable
+\end{proof}
+
+Likewise, variable are also decidable
+
+\begin{lemma}
+  $x \in \code{FVar'}$ is decidable
+\end{lemma}
+\begin{proof}
+  This boils down to $\et<1>[y]{\nat}{x \peq y}$, which is trivially true $(x, x)$
+\end{proof}
+
+\todo{Examples of formulas}
+
 %%% Local Variables:
 %%% mode: LaTeX
 %%% TeX-master: "../main"

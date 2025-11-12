@@ -1,27 +1,36 @@
 
 \section{Omega Types}
 
-\label{sec:omega_types}
+While mu types allowed us to generalize linear quanties to graded ones, we have a construction, $\Omega$, that generalizes mu types to arbitary formulas.
+We do this by specifing a quantity formula for the type, rather than a specific quantity.
 
-The principle use of \code{Form} here is as part of the $\Omega$ construction, which uses it to constraint over mutliplicity, thereby giving us an equivalent of \granule effect formulas,
-
-\subsection{Poly-multiplicative Judgments}
-
-\begin{definition}
-	\label{def:Omega_ty}
-	$\Omega$ is a type indexed by a formula, $\phi$, a type $t$, and a witness of that type, such that $\tw \phi t w \deq_0 \tw_n \phi t w$
+\begin{definition}[Omega definition]
+  $\Omega$ is a type indexed on a \code{Form}, a type, and a witness of that type such that
+  $\tw{p}{t}{w} \deq \fn<1>[n]{\nat} \afa<0>{n \in p}{\tm n t w}$
 \end{definition}
 
-That is, an $\Omega$ designates a function from a natural number to a certain number of $t$.
-However, this is often unedsierable, so we instead efine a helper function, reify, of the type $\fn_1{\tw \phi t w}{\fa_1[n]{\nat}{\afa_0{(n \in \phi)}{\tm n t w}}}$, which, allows for us to instead consider if the number in is in the ``solution set'' as opposed to a value projected to.
-  
-The most simple form of $\Omega$ is that where $\phi$ is \code{FVar} and thus is simply, $\tw_n {\code{FVar}} t w$, or simply $\tw* n t w$, which we specifically call $\omega t w$, and $\omega t w \deq_0 \tw* n t w$
+That is, it maps a number that satisfies the property of being a solution to a formula to that many bindings of that value.
 
-\subsection{Sources and Factories}
-\label{sec:factor_source}
+\subsection{Basic Properties}
+\label{sec:omega_prop_basic}
 
+One of the most signaficant properties of $\Omega$ is that it can be ``weakened''.
+That is, if a given formula $p$ is ``in'' $q$, then there exists a function from $\tw{q}{t}{w}$ to $\tw{p}{t}{w}$, which we call \code{weaken}.
+The reason that this must exist is apparent upon expanding the types, whence we get $\code{weaken} : \afa<0>{p \subseteq q} \fn<1>{(\tw*[m]{q}{t}{w})}{(\tw*[n]{p}{t}{w})}$, which is trivial
+\todo{Motavating example}
 
-%END OF SET E
+\subsection{Operations on Omega}
+\label{sec:omega_ops}
+
+\subsection{Completeness and Uniqueness of Omega}
+\label{sec:omega_complete_unique}
+
+There are two very important facts about omega types, specifically with reference to mu types.
+Namely, they both revolve around the idea that omega types can serve as an exact model for mu types.
+The first of these is the fact that forall $\tm n t w$, there is a linearly isomorphic $\Omega$
+
+\subsection{Infinite Lazy Copies}
+\label{sec:omega_lazy}
 
 %%% Local Variables:
 %%% mode: LaTeX

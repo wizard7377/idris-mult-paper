@@ -1,26 +1,22 @@
 \ProvidesPackage{macros}[2025/11/07]
 
 
-\NewDocumentCommand{\fn}{e{_}omm}{{\ensuremath{%
+\NewDocumentCommand{\fn}{d<> o m}{{\ensuremath{%
 			\IfNoValueTF{#2}{#3}{(#2 : #3)}%
 			\IfNoValueTF{#1}{\to}{\to_{#1}}% 
-			#4%
 }}}
-\NewDocumentCommand{\fa}{e{_}omm}{{\ensuremath{%
+\NewDocumentCommand{\fa}{d<> o m}{{\ensuremath{%
 			\forall\IfNoValueTF{#2}{#3}{(#2 : #3)}%
 			\IfNoValueTF{#1}{\to}{\to_{#1}}% 
-			#4%
 }}}
 %Pair types
-\NewDocumentCommand{\sg}{e{_}omm}{{\ensuremath{%
+\NewDocumentCommand{\sg}{d<> o m}{{\ensuremath{%
 			\forall\IfNoValueTF{#2}{#3}{(#2 : #3)}%
 			\IfNoValueTF{#1}{\times}{\times_{#1}}% 
-			#4%
 }}}
-\NewDocumentCommand{\et}{e{_}omm}{{\ensuremath{%
+\NewDocumentCommand{\et}{d<> o m}{{\ensuremath{%
 			\IfNoValueTF{#1}{\exists}{\exists_{#1}}% 
-			\forall\IfNoValueTF{#2}{#3}{(#2 : #3)}%
-			#4%
+			\IfNoValueTF{#2}{#3}{(#2 : #3)}%
 }}}
 \NewDocumentCommand{\sfn}{ O{1} O{\_} m m }{{\ensuremath{%
 			\ifstrequal{#2}{\_}{#3}{(#2 : #3)}%
@@ -35,21 +31,25 @@
 \NewDocumentCommand{\iarg}{m}{{\ensuremath{\{#1\}}}}
 \NewDocumentCommand{\farg}{m}{{\ensuremath{#1}}}
 
-\NewDocumentCommand{\afa}{e{_}omm}{{\ensuremath{%
+\NewDocumentCommand{\afa}{d<> o m}{{\ensuremath{%
 			\forall\IfNoValueTF{#2}{#3}{(#2 : #3)}%
 			\IfNoValueTF{#1}{\Rightarrow}{\Rightarrow_{#1}}% 
-			#4%
 }}}
 \NewDocumentCommand{\safa}{e{_}omm}{{\ensuremath{%
 			\forall\IfNoValueTF{#2}{#3}{(#2 : #3)}%
 			\IfNoValueTF{#1}{\to}{\to_{#1}}% 
 			#4%
 }}}
+
+\NewDocumentCommand{\formp}{m}{\code{Form'} #1}
+\NewDocumentCommand{\evalp}{m m}{\code{Eval'} #1 #2}
 \NewDocumentCommand{\conat}{}{\ensuremath{\mathbb{N}_\infty{}}}
 \NewDocumentCommand{\cosuc}{m}{\ensuremath{S_\infty{} \ #1}}
 \NewDocumentCommand{\conil}{}{\ensuremath{0_\infty}}
 \NewDocumentCommand{\cofin}{m}{\ensuremath{{\code{Fin}_{\nat{}} \ {#1}}}}
-\NewDocumentCommand{\cofix}{}{\ensuremath{\infty_{\nat{}} \ {#1}}}
+\NewDocumentCommand{\cofix}{}{\ensuremath{\infty_{\nat{}}}}
+
+
 %\Def\afa#1#2 :#3.#4 {{\ensuremath{%
 %			\forall\ifstrequal{#2}{\_}{#3}{(#2 : #3)}% 
 %			\ifstrequal{#1}{*}{\Rightarrow}{\Rightarrow_{#1}} #4%
@@ -67,13 +67,13 @@
 
 %\def\tw#1#2#3 {{\ensuremath{\tomega \ #1 \ #2 \ #3}}}
 %If star, custom val (second), if otherwise with underscore, expand
-\NewDocumentCommand{\tw}{se{_}mmm}{\ensuremath{%
+\NewDocumentCommand{\tw}{sommm}{\ensuremath{%
 	\IfBooleanTF{#1}
-		{{\fn_1[#3]{\nat}{M \ #3 \ #4 \ #5 }}}%
+		{{\fn<1>[#2]{\nat} \afa<0>{#2 \in #3} {M \ #2 \ #4 \ #5 }}}%
 		{%
 		\IfNoValueTF{#2}
 			{\Omega \ #3 \ #4 \ #5}%
-			{\fn_1[#2]{\nat}{M \ (\code{Eval} \ #3 \ #2) \ #4 \ #5 }}%
+			{\fn<1>[#2]{\nat}{M \ #2 \ #4 \ #5 }}%
 		}%
 }}
 
