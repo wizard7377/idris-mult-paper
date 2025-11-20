@@ -1,35 +1,47 @@
 
 \section{Omega Types}
 
-While mu types allowed us to generalize linear quanties to graded ones, we have a construction, $\Omega$, that generalizes mu types to arbitary formulas.
-We do this by specifing a quantity formula for the type, rather than a specific quantity.
+Omega types allow us to generalize mu types to bindings that have mutiple possible values.
+For instances, in the \granule{} binding \verb|x : t [2*c]|, the binding has a variable multiplicity given by the effect formula $2 * c$ \cite{dep_mult_dep_lin}.
+This allows for Granule to have, say, a function \code{mapMaybe} which has the form $\fn<0..1>{(\fn<1>{a} b)} {\fn<1>{(\code{Maybe} a)} (\code{Maybe} b)}$.
 
-\begin{definition}[Omega definition]
-  $\Omega$ is a type indexed on a \code{Form}, a type, and a witness of that type such that
-  $\tw{p}{t}{w} \deq \fn<1>[n]{\nat} \afa<0>{n \in p}{\tm n t w}$
+Of course, this is just one example of many of the potential utility of such a system, perhaps the most interesting of which is modeling the idea of optional ownership.
+We propose $\Omega{}$, which model such bindings of variable multiplicity using a continuations on the exact number of bindings 
+
+$\Omega$ types allow for bindings that have multiplicity polymorphism.
+The simplest example of this is a binding that may or may not be used.
+In \granule{} such bindings are created by allowing for effect formulas to serve as multiplicities 
+
+\subsection{Extended Mu}
+\label{sec:omega_def}
+
+\begin{definition}[Omega types]
+  $\Omega$ is an erased function that takes a \code{Form} as an arguement, as well as a type, $t$, and a witness of $t$, which, altogether, has the singature $\Omega : \fn{\code{Form}} \fn[t]{\tpe} \fn{w} \tpe$.
+  Its definition is $\tw{\phi}{t}{w} \deq \tw*[n]{\phi}{t}{w}$
 \end{definition}
 
-That is, it maps a number that satisfies the property of being a solution to a formula to that many bindings of that value.
+This is simplest understood by example.
 
-\subsection{Basic Properties}
-\label{sec:omega_prop_basic}
+The easiest form of this is $\tw{\code{FVar}}{t}{w}$, which expands to the type $\tw*[n]{\code{FVar}}{t}{w}$.
+Per \ref{lem:gen_var}, this becomes simply $\fn<1>[n]{\nat} \tm n t w$.
+Thereby, this is simply a mapping from any number of bindings to that many bindings of the form $w : t$.
 
-One of the most signaficant properties of $\Omega$ is that it can be ``weakened''.
-That is, if a given formula $p$ is ``in'' $q$, then there exists a function from $\tw{q}{t}{w}$ to $\tw{p}{t}{w}$, which we call \code{weaken}.
-The reason that this must exist is apparent upon expanding the types, whence we get $\code{weaken} : \afa<0>{p \subseteq q} \fn<1>{(\tw*[m]{q}{t}{w})}{(\tw*[n]{p}{t}{w})}$, which is trivial
-\todo{Motavating example}
+Another simple form of $\Omega$ is that where the formula is some $\code{FVal}$.
+This type, given that the specific number is $m$, expands to $\tw*[n]{\apply{FVal}{m}}{t}{w}$.
+Because $\fsolve{\code{FVar m}}{n}$ only exists if $n \peq m$, we know that this will simply be equivalent to $\tm m t w$.
 
 \subsection{Operations on Omega}
-\label{sec:omega_ops}
+\label{sec:omega_operate}
 
-\subsection{Completeness and Uniqueness of Omega}
-\label{sec:omega_complete_unique}
+Given the fact that $\Omega$ attempts to generalize $M$, it stands to reason that each of the operations on \musym{} have equivalents on $\Omega$.
 
-There are two very important facts about omega types, specifically with reference to mu types.
-Namely, they both revolve around the idea that omega types can serve as an exact model for mu types.
-The first of these is the fact that forall $\tm n t w$, there is a linearly isomorphic $\Omega$
+This, unfourtanetly, is only partially true.
+This is because while operations that serve to ``combine'' \omegasym{} with itself generally exist, operations that ``split'' \omegasym{} into many \omegasym{} do not exist.
+This is because of the fact that each \omegasym{} is quite crucially a linear function, we can only use it once.
+However, let us assume we had a $\fn<1>{\tw{(\phi + \psi)}{t}{w} (\tw{\phi}{t}{w} \times^1 \tw{\psi}{t}{w})$
 
 \subsection{Infinite Lazy Copies}
+
 \label{sec:omega_lazy}
 
 %%% Local Variables:

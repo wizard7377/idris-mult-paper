@@ -13,7 +13,7 @@ The definitions of this in Idris are given at \ref{lst:mu_def}.
 In addition, $M$ has two constructors
 
 \begin{definition}
-	There are two constructors of $M$, $\mz$ \code{MZ}, and $\odot$, \code{MS}, Which have the signatures $\mz : \tm n t w$ and $\ms : \fn<1>[w]{t}{\fn<1>{\tm n t w}{\tm {(\code{Succ} n)}}}$ 
+	There are two constructors of $M$, $\mz$ \code{MZ}, and $\odot$, \code{MS}, Which have the signatures $\mz : \tm n t w$ and $\ms : \fn<1>[w]{t}{\fn<1>{\tm n t w}{\tm {(\code{Succ} n)} t w}}$ 
 \end{definition}
 
 Firstly, it should be noted that the names were chosen due to the fact that the indices of them are related. 
@@ -201,7 +201,7 @@ Per as a matter of fact, it isn't actually possible to construct \mcombine in Gr
 \end{proof}
 
 Given that we can ``add'' (Or, as we will see later, multiply) two $M$, it would seem natural that we could also subtract them.
-We can this function, which is the inverse of \code{combine}, \code{split}, which has the signature $\code{split}: \fa<0>[m]{\nat}{\fa<1>[n]{\nat}{\fn<1>{\tm {(m + n)} t}}$.
+We can this function, which is the inverse of \code{combine}, \code{split}, which has the signature%  $\code{split}: \fa<0>[m]{\nat}{\fa<1>[n]{\nat}{\fn<1>{\tm {(m + n)} t  }}$.
 We actually use this a fair bit more than we use \code{combine}, as \code{split}doesn't impose any restrictions on the witness, which is very useful for when we discuss \carat types.
 
 In a similar manner to how we proved (in \ref{lem:combine_comm}) the commutativity of \mcombine, we can prove that these are inverses.

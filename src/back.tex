@@ -50,33 +50,37 @@ Granted, our version is almost exactly the same, and is defined as follows:
 
 The rest of the operations use a model as close to the simple inductive definitions as possible, using \code{copy} instead of the more complex \code{duplicate}.
 
+\begin{theorem}[Finite Initial]
+  \label{thm:fin_init}
+  There is a finite list of all the inhabitents of $\sg<1>[n]{\nat} (n \leq v)$, where $z : \nat$
+\end{theorem}
+\begin{proof}
+  TODO
+\end{proof}
 \paragraph{Conatural Numbers}
 
 \todo{Finish this}
 
-\subsection{Existential Types}
+\subsection{Dependent Pairs}
 
-Existential types, regarding dependent types, usually refers to dependent pair ($\Sigma$) types \cite{hottbook}.
-In this context, we see the first element of the pair as ``evidence'' for the type of the second element of the pair.
-In Idris, this is formalized (in \idris's \citetitle{idris_base}) by stating that the first argument is runtime erased, similarly to which universal quantification is a function that is erased.
+As is common, in Idris, existentials are modeled as a dependent pair \cite{hottbook} \cite{hott_sets}.
+With Idris, however, there is an extra portion to this.
+Specifically, we can also change the multiplicity of the first and second element of the pair.
+In addition, we can chose to make these linear, unrestricted, or erased.
+Because one of the central goals of this is to create a system that does not use unrestricted bindings, we focus only on the linear and erased possibilities.
 
-However, for our usage here this is not suitable, as we are dealing with principally linear values, and \ident Exists is unrestricted.
-Fourtanetly, however, the change from unrestricted to linear existentials is quite trivial, the construction of which may be found at \ref{lst:def_lexists1}
+The possible combinations, and their names in Idris, as well as their constructors, are given below
+\begin{tabular}{|c || c | c|}
+    \hline{}
+    & $0$ & $1$ \\
+    \hline{}
+    $0$ & $\Sigma^1$, \code{Sigma}, \code{For} & $\exists^1$, \code{Exists}, \code{Given} \\
+    \hline{}
+    $1$ & $\Sigma^0$, \code{Subset}, \code{Elem} & $\Sigma^1$, \code{Sigma}, \code{For} \\
+    \hline{}
+\end{tabular}
 
-\begin{listing}
-	\begin{minted}{idris}
-		record Exists (t : Type) (p : (t -> Type)) where
-			constructor Evidence
-			0 fst' : t 
-			1 snd' : p fst'
-	\end{minted}
-	\caption{Definition of linear existentials}
-	\label{lst:def_lexists1}
-\end{listing}
-
-Not much is notable about this, we define the operations as is usual, except every time a function would be unrestricted over the second value it is instead linear.
-We also have a operator, \code{\#?}, which serves as sugar for this, using \idris's \ident typebind , mechanism.
-
+We write all of these with the same ``typebind'' shorthand, which, when binding application is added, will allow the above to be written as $\code{For} (x : \nat) | (x \peq x)$, for instance \cite{binding_app}.
 
 %%% Local Variables:
 %%% mode: LaTeX

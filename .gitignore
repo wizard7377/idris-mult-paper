@@ -335,3 +335,8 @@ _minted
 .vscode
 *~
 _*
+
+*.log
+*.ist
+main.prv/
+.vscode/

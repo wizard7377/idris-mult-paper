@@ -1,8 +1,8 @@
 \section{Resource Algebras as Types}
 
-In many programming languages, algebras are used as a supplement to the type system to model various concepts.
+In many programming languages, algebras are used as a supplement to the type system to model various concepts \cite{effekt} \cite{koka_1} \cite{flix_paper}.
 Among these, Granule uses a resource algebra to model multiplicity \cite{quant_graded_modal}.
-However, a number of libraries in Haskell use the type system itself to model algebras \needcite{}.
+However, a number of libraries in Haskell use the type system itself to model algebras \needcite{}. 
 
 It stands to reason then that it should be possible, with mu types and Idris' rich type system, to model the resource algebras of Granule.
 We propose that this is indeed possible with a definition of \code{Form'} types.
@@ -28,17 +28,20 @@ This means that \code{Form'} forms a category on $\subseteq$
 
 \subsection{The Core Formulas}
 
-Out of six total constructors of formulas, four of them are binary constructors modeling addition, multiplication, joins and meets, while the other two model the basic notion of ``variable'' and ``constant'' in a formula.
-
-These last two we will discuss first.
-The first of these is \code{FVar'}, which has the type $\code{Form'} 1$. 
+The first \code{Form'} iS these is \code{FVar'}, which has the type $\code{Form'} 1$. 
 It models the notion of a singular variable in the formula.
 It evaluates as $\code{Eval'} \code{FVar'} [x] \deq x$, notably, however, this is the only branch, as the only possible index that \code{FVar'} can produce is 1.
 
 Of all the formulas, \code{FVar'} is the most general. 
 That is to say, it is the terminal object in the category of \code{Form'}. 
 
-\todo{Need proof}
+\begin{lemma}
+  \label{lem:gen_var}
+  $\fsolve{\code{FVar'}}{n}$ is trivial.
+\end{lemma}
+\begin{proof}
+  This expands to $\fsolve[x]{\code{FVar'}}{n}$, which, if we have $(n, \alpha)$, where $\alpha$ is $\feval{\code{FVar'}}{n} \peq n$, which is trivial.
+\end{proof}
 
 The next of these, \code{FVal'}, models the notion of ``constants'' in formulas.
 It has the form $\code{FVal'} : \fn<1>{\nat}{\code{Form'} 0}$, and has the evaluation of $\code{Eval'} (\code{FVal'} n) [] \deq n$
@@ -46,50 +49,106 @@ It has the form $\code{FVal'} : \fn<1>{\nat}{\code{Form'} 0}$, and has the evalu
 \subsection{The Binary Constructors }
 \label{sec:bin_cons}
 
-The remaining constructors of $\formp{n}$ all have the exact same form, that of $\fa<1>[a]{\nat} \fa<0>[b]{\nat} \fn<1>{\formp{a}} \fn<1>{\formp{b}} \formp{a + b}$.
-They are \code{FAdd'}, \code{FMul'} \code{FMax'}, \code{FMin'}, which model addition multiplication joins and meets.
-The branch of \evalp{FAdd' p q}{n} is as follows:
+The remaining constructor models the notion of ``binary operations'' on \code{Form'}.
+It allows us to create a very basic tree of quantity expressions, which, combined with \code{FVal'} and \code{FVar'}, allow us to model literals, variables, and ``applications'' of either addition, multiplication, minimims and maximums to those formulas.
 
+It makes use of a enumeration type, \code{FOp}, which are attatched to each operation on two values.
+\begin{definition}
+  We define $\code{FOp} = + | - | min | max$, and also define \code{runOp} that has the type $\fn<1>{op} \fn<1>{\nat} \fn<1>{\nat} \nat$, such that we map the operation in \code{FOp} to its corresponding two arguement function
+\end{definition}
+
+\todo{Notation}
+
+\code{FApp'} then takes that operations and applies it to two formulas.
+This allows us to create ``quantity expressions''.
+\begin{definition}
+  \code{FApp'} is of the type $\code{FApp'} : \fn<1>[op]{\code{FOp}} \fa<1>[a]{\nat} \fa<0>[b]{\nat} \fn<1>{\code{Form'} a} \fn<1>{\code{Form'} b} {(\apply{Form'}{(a + b)})}$.
+\end{definition}
 \missingcode{}
 
-The other branches are defined similarly, simply switching out the operation of addition for whatever operation is appropriate.
+Note that we \emph{add} the number of variables in the types, and the first number is linear, not erased.
+This has to do with the system of variables in \code{Form'}: each variable can only occur once.
+While this does limit the power of \code{Form'}, it also makes it substaintally simplifies the solving of \code{Form'}.
 
-One of the important facts about all of these constructors is that they operate on two formulas \emph{Indepently}.
-That is, if $y \in \phi$ and $z \in \psi$, then it must also be true that $(y + z) \in (\code{FAdd'} \phi \psi)$, and similarly for all the others.
-So, we can reason about both parts of this completly independetly, which will be useful for creating a decision procedure of \code{Solve'}.
+This allows us to reason about formulas easily, because we know that each part of the formula can be solved independtly.
 
+\begin{lemma}
+  If $\fsolve{\phi}{x}$, and $\fsolve{\psi}{y}$, then $\fsolve{\code{FApp'} op \phi \psi}{(\apply{runOp}{op}) x y}$. 
+\end{lemma}
+
+While this dosen't look very intuitive, this is simply the fact that $\fsolve{\phi + \psi}{x + y}$ and so on.
+
+\begin{proof}
+  \todo{Proof}
+\end{proof}
 \subsection{Abstract Forms}
 \label{sec:abstract_form}
 
-Almost all of the reasoning we do about \code{Form'} is about their outputs, but \emph{not} their inputs.
-Because of this, it would be useful to be able to define an abstract $\code{Form}$, that is nullarly and instead abstracts existentially over the \nat{} indice.
-We define it as \todo{Add def}
+While so far we have been dealing with formulas with explicit numbers of variables.
+However, we almost never actually care about the inputs to a formula, we care only about the outputs.
+Neither $x \in \phi$ or $\phi \subseteq \psi$ is dependent on the type of the given formulas.
+So, rather than dealing with the ``concrete'' types, we instead deal with an abstract type, \code{Form}, which is a dependent linear pair of the form $\sg<1>[n]{\nat} (\code{Form'} n)$.
 
-\subsection{Decidability of Solutions}
-\label{sec:dec_solve}
+We then apply equivalents to each operation that works on \code{Form} instead of \apply{Form'}{n}, and there name is the respective operation, merely with the prime dropped from the end
+We also define $\code{Solve}$ and $\code{Unify}$, which are defined likewise.
+Finally, we use the same notation for $\code{Form}$ as $\code{Form'} n$, $5$ for $\apply{FVal}{5}$, $\phi + \psi$ for $\code{FAdd} \phi \psi$, and $x \in \phi$ for \code{Solve} and $\phi \subseteq \psi$ for $\code{Unify} \phi \psi$.
 
-One of the most important properties of the algebra that we have defined here is that is provably decidable, that is, everything can be determined to be a solution of a formula or a contradiction of such by a terminating function.
+Altogether, the formula language is as follows:
 
-We prove each part individaully
+\begin{bnf}
+  op ::= | $+$ | $*$ | min | max ;;
+  $\phi$ : Form ::=
+  | $n$ : Number
+  | $\_$ : Variable
+  | $\phi$ op $\phi$ : Application
+\end{bnf}
+
+\subsection{Decidability of Formulas}
+\label{sec:form_dec}
+
+One of the reaons this specific set of formula types was chosen is that it allows for $\fsolve{\phi}{n}$ to be provably terminadbly decidable for any formula and natural number.
+That is, their is a total function \code{DecSolve} from a formula and natural number to either $\fsolve{\phi}{n}$ or a proof that it is absurd
+
+We prove this by case anaylisis and induction.
+Firstly, we have the two base cases:
 
 \begin{lemma}
-  \label{lem:solve_val}
-  $x \in \code{FVal'} n$ is decidable
+  \label{lem:dec_fvar}
+  $\fsolve{\code{FVar'}}{n}$ is decidable.
 \end{lemma}
 \begin{proof}
-  This boils down to $\et<1>[y]{\nat} (x \peq n)$, and, as equiality of \nat{} is decidable, is itself decidable
+  This reduces to $\fsolve[x]{\code{FVar'}}{n}$, which simply has $(n, \code{Refl})$.
 \end{proof}
-
-Likewise, variable are also decidable
 
 \begin{lemma}
-  $x \in \code{FVar'}$ is decidable
+  \label{lem:dec_fvar}
+  $\fsolve{\code{FVal'} v}{n}$ is decidable.
 \end{lemma}
 \begin{proof}
-  This boils down to $\et<1>[y]{\nat}{x \peq y}$, which is trivially true $(x, x)$
+  This reduces to $\fsolve[x]{\code{FVal' v}}{n}$, which further reduces to $\et<1>[x]{\nat} (v \peq n)$, and, as natural number equality is decidable, is decidable
 \end{proof}
 
-\todo{Examples of formulas}
+Their are 4 more inductive cases, one for each operation.
+
+However, first, we must define the induction hypothesis.
+Because for each case they are exactly the same, we note them all here.
+
+\begin{hypo}
+  $\phi$ and $\psi$ are both formulas, and for any $y$, $\fsolve{\phi}{y}$ and $\fsolve{\psi}{y}$ are decidable
+\end{hypo}
+
+We ultimately end up supplying these prerequisties using the result itself by induction.
+
+We first note that there is a way to ``split'' each of these operations into two parts:
+
+\begin{lemma}
+  The existence of natural numbers $x$ and $y$, where $x \circ y = z$ such that $\fsolve{\phi}{x}$ and $\fsolve{\psi}{y}$, is equivalent to $\fsolve{\phi \circ \psi}{z}$.
+  That is, $\et<1>[x]{\nat} \et<1>[y]{\nat} (\fsolve{\phi}{x} \wedge \fsolve{\psi}{y} \wedge x \circ y = z)$ is equivalent to $\fsolve{\phi \circ \psi}{z}$ 
+\end{lemma}
+
+\begin{proof}
+  \todo{Proof}
+\end{proof}
 
 %%% Local Variables:
 %%% mode: LaTeX
