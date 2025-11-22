@@ -23,7 +23,6 @@ We then say that a given number is ``in'' the formula if it is possible for it t
 We define the interpretation of each constructor of \code{Form'} based off its branch of \code{Eval'}
 
 This means that \code{Form'} forms a category on $\subseteq$
-
 \todo{Need proof}
 
 \subsection{The Core Formulas}
@@ -132,23 +131,9 @@ Their are 4 more inductive cases, one for each operation.
 
 However, first, we must define the induction hypothesis.
 Because for each case they are exactly the same, we note them all here.
+\subsection{Formula Syntax Sugar}
+\label{sec:formulaic}
 
-\begin{hypo}
-  $\phi$ and $\psi$ are both formulas, and for any $y$, $\fsolve{\phi}{y}$ and $\fsolve{\psi}{y}$ are decidable
-\end{hypo}
-
-We ultimately end up supplying these prerequisties using the result itself by induction.
-
-We first note that there is a way to ``split'' each of these operations into two parts:
-
-\begin{lemma}
-  The existence of natural numbers $x$ and $y$, where $x \circ y = z$ such that $\fsolve{\phi}{x}$ and $\fsolve{\psi}{y}$, is equivalent to $\fsolve{\phi \circ \psi}{z}$.
-  That is, $\et<1>[x]{\nat} \et<1>[y]{\nat} (\fsolve{\phi}{x} \wedge \fsolve{\psi}{y} \wedge x \circ y = z)$ is equivalent to $\fsolve{\phi \circ \psi}{z}$ 
-\end{lemma}
-
-\begin{proof}
-  \todo{Proof}
-\end{proof}
 
 %%% Local Variables:
 %%% mode: LaTeX

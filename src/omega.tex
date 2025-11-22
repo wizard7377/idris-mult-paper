@@ -33,13 +33,14 @@ Because $\fsolve{\code{FVar m}}{n}$ only exists if $n \peq m$, we know that this
 \subsection{Operations on Omega}
 \label{sec:omega_operate}
 
+Among the more important operations on \omegasym
+
+
 Given the fact that $\Omega$ attempts to generalize $M$, it stands to reason that each of the operations on \musym{} have equivalents on $\Omega$.
+This is, unfourtanetly, only partially true.
 
-This, unfourtanetly, is only partially true.
-This is because while operations that serve to ``combine'' \omegasym{} with itself generally exist, operations that ``split'' \omegasym{} into many \omegasym{} do not exist.
-This is because of the fact that each \omegasym{} is quite crucially a linear function, we can only use it once.
-However, let us assume we had a $\fn<1>{\tw{(\phi + \psi)}{t}{w} (\tw{\phi}{t}{w} \times^1 \tw{\psi}{t}{w})$
-
+While we can create equivalents of $\code{combine}$ and $\code{join}$, we \emph{cannot} create the equivalents of $\code{split}$ and can only create a specific version $\code{expand}$.
+The reason for this is as follows
 \subsection{Infinite Lazy Copies}
 
 \label{sec:omega_lazy}

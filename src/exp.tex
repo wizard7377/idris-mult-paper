@@ -1,10 +1,44 @@
 \section{Exponential Types}
 
+Linear exponential types have been noted previously to be equivalent to a certain number of bindings of a value.
+Indeed, this is why they are called \emph{exponential} types, as, say, $\code{String}^3$ models $\code{String} \times \code{String} \times \code{String}$.
+Here, we construct $\code{Exp}$, which models exponential types using $\Omega$ types abstracted over their witness.
+This allows us to transform the $\Omega$, which requires a witness of the value, to something more closely resembling the type of graded value \emph{themselves}.
+
+\begin{definition}[Exponential Types]
+  \label{def:exp_type_core}
+  \code{Exp} is a type function indexed on a formula, $\phi$, and type, $t$, with the definition of $\code{Exp} \phi t \deq \et<1>[w]{t} {(\tw{\phi}{t}{w})}$.
+\end{definition}
+
+We also, as the name suggests, employ a terse notation using the syntax sugar described for formulas earlier \ref{sec:formulaic} to write these more expressivly.
+
+\begin{notation}
+  We write $t \carat \phi$, where $\phi$ is a formula-like object and $t$ is a type for $\code{Exp} \phi t$, and, for an even simpler syntax, $t^\phi$. 
+\end{notation}
+
+This syntax allows us to write, say $t^2$ for $\code{Exp} {(\code{Given} 0 \code{FVal'} (S (S 0)))} t$, which is obviously much clearer \footnote{Obviously, this example is a little bit ridiculos, as we already have, say, $2 \peq (S (S 0))$, but it still is true that this is a more terse syntax}.
+
 \subsection{Exponential Types as Graded Values}
 \label{sec:exp_grade}
 
-\subsection{Operations on Exponential Types}
-\label{sec:exp_ops}
+Exponential types serve the primary purpose of modeling linear values, rather than the bindings of those values.
+So, for instance, the granule type $\code{String} [2]$ is modeled by $\code{String}^2$
+One of the most important facts about exponential types is that they are functorial over \emph{both} their first and second arguements\footnote{With respect to $\subseteq$}.
+
+\begin{lemma}
+  Exponential types have a function ${\code{map}_{\code{Exp}}}_{2} : \fa<0>[p]{\fn<1>{t} u} \fn<1>{(\fa<0>[w_t]{t} \fn<1>{\tw{\phi}{t}{w_t}} \tw{\psi}{u}{(p w_t)})} {\fn<1>{\txp{\phi}{t}} \txp{\psi}{u}}$ \footnote{Note that when we want to disambitguate among \musym and \omegasym and $\code{Exp}$ types, we use a subscript to differentiate them}
+\end{lemma}
+\begin{proof}
+  For ${\code{map}_{\code{Exp}}}_{2} f x$, we have $Given (p x_{1}) (\map_{\Omega} f x_{2})$
+\end{proof}
+
+Next, and slightly more interesting, is that over the second 
+\begin{lemma} 
+  Exponential types have a function ${\code{map}_{\code{Exp}}}_{1} : \afa<0>{\phi \subseteq \psi}{\fn<1>{\txp{\phi}{t}} \txp{\psi}{t}}$ (we call this \code{weaken})
+\end{lemma}
+\begin{proof}
+  We simply have \todo{Finish}
+\end{proof}
 
 \subsection{The type of Strings Squared}
 \label{sec:num_exp}
