@@ -40,9 +40,46 @@ Next, and slightly more interesting, is that over the second
   We simply have \todo{Finish}
 \end{proof}
 
+And therefore, we have \todo{Add bimap}.
+We can also state that the initial object in the category of exponential types is $\bot^n$, as the inital category of types is $\bot$ and the inital formula is just a variable.
+
+This shows something very important, exponential types allow us to model graded values using only linear types, but rather than modeling them as judgements, viewing them as types.
+In essence, the only reason that we need the witness is to ensure that all the values are the same.
+However, they maintain all the utility of terms while having the full flexibility of $\Omega$ types.
+
+Granted, they have one major problem.
+Namely, operations that split them have the same restrictions as described in \ref{fig:bad_expand}.
+In addition, the combine rule has an additional restriction: the exponenets must have the same witness.
+This is because we can no longer guarntee that two exponentials having the same type means that they provide the same value.
+
 \subsection{The type of Strings Squared}
 \label{sec:num_exp}
 
+As has been noted before, linear exponential types have a very nice interpretation as numerical exponentials, namely, the following is always true
+
+\begin{figure}
+  \label{fig:num_exp}
+\begin{align}
+  t^{n + 1} &\liso (\sg<1>{t} t^n) \\
+  t^0 &\liso \mathbf{1} \text{When $t$ is not $\mathbf{0}$} \\
+  \mathbf{0}^n &\liso \mathbf{0} \\
+  t^1 &\liso t \\
+  \mathbf{1}^n &\liso \mathbf{1}
+\end{align}
+
+\end{figure}
+Given that $\mathbf{0} = \bot$, and $\mathbf{1} = \top$.
+
+\begin{remark}
+  All the properties in \ref{fig:num_exp} are true.
+\end{remark}
+\begin{proof}
+  The first of these is the only one that is truelly ``diffucult''. However, since we \emph{can} define splitting of finte values, this is not incredibly diffucult.
+  The rest of the proofs somewhat simply follow
+  \begin{itemize}
+  \item $\txp{0}{t}$ simply reduces to $\txp[w][n]{0}{t}$, which 
+  \end{itemize}
+\end{proof}
 \subsection{Inverting Types}
 \label{sec:exp_inv}
 

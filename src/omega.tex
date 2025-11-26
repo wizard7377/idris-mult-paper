@@ -1,4 +1,3 @@
-
 \section{Omega Types}
 
 Omega types allow us to generalize mu types to bindings that have mutiple possible values.
@@ -30,20 +29,134 @@ Another simple form of $\Omega$ is that where the formula is some $\code{FVal}$.
 This type, given that the specific number is $m$, expands to $\tw*[n]{\apply{FVal}{m}}{t}{w}$.
 Because $\fsolve{\code{FVar m}}{n}$ only exists if $n \peq m$, we know that this will simply be equivalent to $\tm m t w$.
 
+Given that $\tm{n}{t}{w}$ is unique, and given the fact that $\tw{\phi}{t}{w}$ serves as a generalization of mu types, it stands to reason that $\tw{\phi}{t}{w}$ is provably unique.
+This is partially true.
+Namely, this can be proven, but only by assuming $\eta$ equivalence.
+
+By using \todo{Add ref to section in introduction}, this is then a trivial corrallary 
+
+\begin{lemma}[Uniqueness of Omega]
+  $\tw{\phi}{t}{w}$ is unique. 
+\end{lemma}
+\begin{proof}
+  \todo{Proof}
+\end{proof}
 \subsection{Operations on Omega}
 \label{sec:omega_operate}
 
-Among the more important operations on \omegasym
+Among the more important operations on \omegasym are mapping and weakining.
+Mapping generalizes the notion of mapping upon $\musym$ to those upon $\omegasym$.
+Just like $\musym$, we can similarly map a simple unrestricted function over a $\omegasym$.
+We can, doing something similar to what we did in \todo{Add ref to mapping} and create a derivation that uses a function in an omega multiplicity.
 
+The other operation is very important, as it allows us to use these in practice.
+It is derived from a (slightly simplified) version of the $\sqsubseteq$ rule presented in \citetitle{quant_graded_modal}, as shown in \todo{Add figure Of the form of the rule in the Granule paper}.
+
+Its definition is ultimately given as follows:
+
+\begin{construction}[Restriction]
+  There is a value $\code{restrict}$, which, given a $\tw{\phi}{t}{w}$ and $\funify{\psi}{\phi}$, then we have $\tw{\psi}{t}{w}$
+\end{construction}
+
+\begin{proof}
+  We first expand the second arguement to $\funify[n]{\psi}{\phi}$, and the result and arguement to $\tw*[n_0]{\psi}{t}{w}$ and $\tw*[n_1]{\phi}{t}{w}$, respectivly. 
+  We can therein introduce $n_1$ and $\fsolve{n_1}{\phi}$, respectivly, and are left with the goal $\tm{n_0}{t}{w}$.
+  However, since we know that because of the property required that \todo{Add formulas}, and therefore, we can provide the goal.
+\end{proof}
 
 Given the fact that $\Omega$ attempts to generalize $M$, it stands to reason that each of the operations on \musym{} have equivalents on $\Omega$.
 This is, unfourtanetly, only partially true.
 
-While we can create equivalents of $\code{combine}$ and $\code{join}$, we \emph{cannot} create the equivalents of $\code{split}$ and can only create a specific version $\code{expand}$.
-The reason for this is as follows
-\subsection{Infinite Lazy Copies}
+While we can create equivalents of $\code{combine}$ and $\code{join}$, we \emph{cannot} create the exact equivalents of $\code{split}$ and can only create a specific version $\code{expand}$.
+The reason for this is that we cannot ``split off'' a certain number of values from a function.
+So, if we \emph{did} have a function $\code{split}_\Omega : \fn<1>{\tw{p + q}{t}{w}} {\sg<1>{\tw{p}{t}{w}} \tw{q}{t}{w}}$, it would have to expand to 
+$\code{split}_\Omega : \fn<1>{\tw*[n_0]{p + q}{t}{w}} {\sg<1>{\tw*[n_1]{p}{t}{w}} \tw*[n_2]{q}{t}{w}}$.
+We would need to know the total number of bindings $n_0$, but there is no guarentee that we will have $n_1$ and $n_2$ at the same time.
 
+A similar problem exists with \code{expand}, where we have to solve for an arbitrary number of values.
+\begin{figure} 
+\label{fig:bad_expand}
+\[
+    \code{expand}_\Omega : \fn<1>{\tw{p * q}{t}{w}} {\tw{p}{\tw{q}{t}{w}}{?}} \\
+    \code{expand}_\Omega : \fn<1>{\tw*[n_0]{p * q}{t}{w}} {\tw*[n_1]{p}{\tw*[n_2]{q}{t}{w}}{?}}
+\]
+\end{figure}
+
+The problem with $\code{split}$ is irreprable: it is impossible for us to define a way to get ``a couple values'' out of $\omegasym$ without also destroying it.
+Fourtanetly, the same cannot be said for expand.
+We can restrict this type of this to only having the form described in 
+
+\begin{figure}[Good Expand Types] 
+\label{fig:good_expand}
+\[
+\code{expand}_\Omega : \fn<1>{\tw{p * q}{t}{w}} {\tw{p}{\tm{q}{t}{w}}{?}} 
+\code{expand}_\Omega : \fn<1>{\tw*[n_0]{p * q}{t}{w}} {\tw*[n_1]{p}{\tm{q}{t}{w}}{?}}
+\]
+\end{figure}
+
+These do have an implementation.
+Given the fact that most of it simply involves the usage of proofs of certain values existing, we omit here.
+
+
+Using these, just as \musym{} generalize the notion of specific multiplicities, \omegasym{} generalizes the notion of arbitrary multiplicities.
+However, unlike \musym{}, $\Omega{}$ generalizes the notion of multiplicity polymorphism.
+So, for instance, we can have variables in a formula rather than just a specific form.
+
+In this sense, $\Omega$ serves as a generalization of $\musym$.
+
+\begin{lemma}
+  $\tw{\code{FVal} n}{t}{w}$ and $\tm{n}{t}{w}$ are equivalent
+\end{lemma}
+\begin{proof}
+  The first of these expands to $\tw*[n']{\code{FVal} n}{t}{w}$, and, as per \todo{Add reference}, this only has the solution of $n' \peq n$, and therefore the function is a constant $\tm{n}{t}{w}$
+\end{proof}
+
+We can then generalize $\code{combine}_\Omega$ as a generalization of $\code{combine}_\musym$, which itself is intended to model context concatenation.
+Indeed, it is perfectly valid to, as we did before, construct meta-logical equivalents of $\code{combine}_\Omega$ in Idris: 
+ 
+\begin{figure}
+	\begin{prooftree}
+		\hypo{\Gamma_0 \vdash x :_p t} 
+		\hypo{\Gamma_1 \vdash x :_q t} 
+		\infer2[Combine]{\Gamma_0, \Gamma_1 \vdash x :_{p+q} t}
+	\end{prooftree}
+	
+	\begin{minted}{idris}
+		combine : (ctx0 -@ Omega p t w) -@ (ctx1 -@ Omega q t w) -@ (ctx0 -@ ctx1 -@ Omega (p + q) t w
+	\end{minted}
+	\label{fig:meta_omega_combine}
+	\caption{The meta-logical $\code{combine}_\Omega$ rule and its Idris 2 equivalent}
+\end{figure}
+
+We can, as we can for $\musym$, create equivalents of meta-logical context flattening and expanding using the Idris equivalents.
+
+\subsection{Infinite Lazy Copies}
 \label{sec:omega_lazy}
+
+While $\Omega$ types can model some uses of unrestricted multiplicities, as noted before \ref{fig:bad_expand}, there are some things, and in particular the splitting of values, that cannot.
+This is a large problem: for definitions, we want to be able to get an arbitrary number of values without changing it.
+While we could introduce an infinite stream of values itself, which would allow us to \emph{get} an infinite number of values, we then couldn't ever drop all the values, or, if it isn't \code{Drop}able, then we can't drop any of the values.
+
+Despite this, we first start off by creating an infinite stream type that has only one co-constructor, $\code{Stream} t x$, which represents an \emph{actually} infinite number of bindings of $x : t$.
+This by itself is somewhat useful, we can, by interleaving values, split it into two sepearate streams.
+The important fact about \code{Stream}, however, is that if $t$ is droppable than $\code{Stream} t x$ is droppable.
+Now, not every type in general is droppable, so at first this dosen't seem that useful.
+But, we know that we can drop $\Omega$, by merely producing exactly 0 bindings.
+So, if we define a datatype $\code{Source}$ as $\code{Source} t x \deq \code{Stream} (\tw{\code{FVar'}}{t}{w})$, we can note that this type is droppable.
+
+Taking a step back, this makes perfect sense.
+Streams are infinite sets of values, but each binding in this case is a variable (and potentially zero) number of bindings.
+So, we get $x + y + z \dots$ number of bindings, where $x, y, z$ etc are all arbitrary natural numbers, which can fall onto any finite or infinite natural numbers, with a potentially infinite amount to spare.
+
+This also has an interpretation physically.
+If one has an infinite supply of a resource, we can take as much or as little as we like by simply specifying the ones we want and then ignoring the rest.
+
+
+% TODO: Add this
+%
+%data Stream : (t : Type) -> (x : t) -> Type where
+%  (::) : (1 x : t) -> (1 xs : Stream t x) -> Stream t x
+
 
 %%% Local Variables:
 %%% mode: LaTeX

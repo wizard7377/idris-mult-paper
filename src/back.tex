@@ -1,22 +1,53 @@
 \section{Background}
 
-\subsection{Copying and Dropping}
+\subsection{Copying Linear Values}
 \label{sec:copy_drop}
 
-Utlitmatly, one of the notable facts about a language like Rust with single use bindings is the notion of cloning, or copying, a value.
-Given that Rust's ownership system can be (partially) modeled by a linear type system, \needcite{}, it makes sense then that Idris' linear library has two interfaces, \code{Duplicable} and \code{Discardable}, which model duplication and droping of linear resources, respectivly.
+Girard's original linear logic has one very large problem\footnote{for usage as a language}, the fact that there is no way to ``duplicate'' premises \cite{linear_logic}.
+While this seems like a non-issue, there are some cases where this is completely inadmissible.
+For instance, consider the natural numbers.
+Using only the logic, it is impossible to define multiplication on two simple linear natural numbers.
 
-However, a choice was made not use \code{Duplicable}, and its associated \code{Copies}, for a couple of reasons:
+This is because if we define multiplication as $0 * n = 0$ and $(S m) * n = (m * n) + n$, this will, unless $m = 1$, have more (or less) than one usage of $n$.
+That is, we cannot ensure that we can use the variable mutiple times.
+Most interestingly, however, is that this models something important: the cloning of memory.
+In a language like Rust (excluding the fact that numbers are \code{Copy}) we can't use a value arbitrary many times.
 
+However, unlike Rust, we cannot have a simple $\code{Clone}$ trait.
+This is because $\code{Clone}$ has a side effect: it has to be in a region (which is equivalent to having an effect) \cite{flix_paper}. 
+In addition, we wouldn't be able to perform equality reflection on the values.
+
+\begin{definition}[Copying Values]
+  \code{Copy} is an interface, indexed on a type, $t$, such that there is a function $\code{copy} : \fn<1>[f]{(\fn<1>[x]{t} \fn<1>[y]{t} (p x y))} \fn<1>[z]{t} (p z z)$
+\end{definition}
+ 
+
+\begin{figure}
+	\begin{prooftree}
+		\hypo{\Gamma , (x : t) , (y : t) , x \peq y \vdash (p x y) } 
+		\infer1[Copy]{\Gamma, (z : t) \vdash (p z z) }
+	\end{prooftree}
+	\label{fig:back_copy}
+	\caption{The copy rule}
+\end{figure}
+
+In other words, take a function that requires two of the same value, and then just use the same value twice, noting its equality
+
+We also have a much simpler drop trait (whose name is also taken from Rust) which given a value destroys it.
+In Idris, this just means it pattern matches against it, returning no useful operation, which can be represented by the existence of a function $\code{drop} : \fn<1>[x]{t} \top$.
+For instance, we can define $\code{Drop} (x = y)$, because there is only one possible constructor, \code{Refl}.
+
+Most values are \emph{both} copyable and dropable.
+Any datatype (or product or sum type) will be dropable if all their components are, and the same for copyable.
+The only two notable things that are not dropable or copyable are
 \begin{itemize}
-\item It is hard to use in practice
-\item It relies heavily on \code{Copies}, which is quite similar to the main construction in this paper, mu types
+\item \code{Type}, as we cannot construct every possible case
+\item Functions, as this would require a way to ``use'' a function, which is not in general possible ($\bot -> \alpha$)
 \end{itemize}
 
-For these reasons, we define a new interface, \code{Copy}, which has two methods, $\code{copy} : \fn<1>{(\fn<1>[x]{a} \fn<1>[y]{a} (p x y))} \fn<1>[z]{a} (p z z)$.
-This essientally ``uses a value twice'' in an arbitrary (potentially dependent) function, and an erased proof that $\code{copy} f z \peq f z z$.
+\paragraph{Cloning}
 
-We also redefine a \code{Drop} interface that is just \code{Consumable} with a different name, though this is more a style choice than anything else.
+In practice, however, this definition can be quite diffucult to work with %FINISH
 
 \subsection{Linear Functions on Numbers}
 
@@ -30,8 +61,6 @@ One of the best examples of this is the natural numbers.
 Clearly, for any binding of $2$, we expect that to be exactly one binding of $1$ inside a succesor function.
 However, this is not the case, rather, Idris by default has it so that data constructor arguements are unrestricted by default.
 This is very important for a case like the natural numbers, where this is taken to the extreme, it is almost always impossible to talk about the \code{Nat} datatype in a useful way with linear bindings.
-
-\paragraph{Natural Numbers}
 
 The solution to this, then, is to define the \emph{linear} natural numbers.
 While the linear library also defines \code{LNat}, we also don't use that, because of the fact that, again, it relies on the \code{Copies} construction, in addition to already not having that large of an implementation to begin with.
@@ -57,9 +86,6 @@ The rest of the operations use a model as close to the simple inductive definiti
 \begin{proof}
   TODO
 \end{proof}
-\paragraph{Conatural Numbers}
-
-\todo{Finish this}
 
 \subsection{Dependent Pairs}
 
@@ -81,6 +107,20 @@ The possible combinations, and their names in Idris, as well as their constructo
 \end{tabular}
 
 We write all of these with the same ``typebind'' shorthand, which, when binding application is added, will allow the above to be written as $\code{For} (x : \nat) | (x \peq x)$, for instance \cite{binding_app}.
+
+Each of these has different parts of the pair being ``inspected''.
+In an existential statement, we don't care about the scurutinee, so that is irrelevant.
+Subset, with its notion of refinement types, dosen't particularly care about the second elements proof, only that it exists.
+Finally, $\Sigma$ represents the ``traditional'' dependent pair, were we (might) care about both elements, and so both of them are linear.
+
+Note that because of the nature of erased bindings, there isn't a difference between a type that has only erased at runtime and an bindings that is $0$, so $\Sigma^1$ models both the linear and erased pair.
+
+\subsection{Notable Categories}
+\label{sec:idr_cat}
+
+In Haskell, it is common to refer to the category encompassing all of Haskell as \code{Hask}
+Here, we do a similar thing, exact for the category of Idris 2 types with functions as morphisms, we call \icat{}.
+In addition, for the category of Idris 2 types with linear functions as morphisms, we write $\icat^1$.
 
 %%% Local Variables:
 %%% mode: LaTeX
