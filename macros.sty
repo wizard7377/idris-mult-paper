@@ -1,35 +1,41 @@
 \ProvidesPackage{macros}[2025/11/07]
 
 \NewDocumentCommand{\musym}{}{\ensuremath{\mathcal{M}}}
+\NewDocumentCommand{\Mu}{}{\ensuremath{\mathcal{M}}}
+
 \NewDocumentCommand{\omegasym}{}{\ensuremath{\Omega}}
+
 \NewDocumentCommand{\fn}{d<> o m}{{\ensuremath{%
-			\IfNoValueTF{#2}{#3}{(#2 : #3)}%
+			\IfNoValueTF{#2}{#3}{(#2 \colon #3)}%
 			\IfNoValueTF{#1}{\to}{\to_{#1}}% 
 }}}
+
 \NewDocumentCommand{\fa}{d<> o m}{{\ensuremath{%
-			\forall\IfNoValueTF{#2}{#3}{(#2 : #3)}%
+			\forall\IfNoValueTF{#2}{#3}{(#2 \colon #3)}%
 			\IfNoValueTF{#1}{\to}{\to_{#1}}% 
 }}}
+
 %Pair types
+
 \NewDocumentCommand{\sg}{d<> o m}{{\ensuremath{%
 			\IfNoValueTF{#1}{%
-                            \sum_{\IfNoValueTF{#2}{#3}{#2 : #3}}%
+                            \Sigma {\IfNoValueTF{#2}{#3}{(#2 \colon #3)}}%
                         }{%
-                            \sum^{#1}_{\IfNoValueTF{#2}{#3}{#2 : #3}}%
+                            \Sigma^{#1}_{1} {\IfNoValueTF{#2}{#3}{(#2 \colon #3)}}%
                         }% 
 }}}
 \NewDocumentCommand{\metaprf}{o}{\cite[][#1]{metamath}}
 \NewDocumentCommand{\et}{d<> o m}{{\ensuremath{%
-			\IfNoValueTF{#1}{\exists}{\exists^{#1}}_{\IfNoValueTF{#2}{#3}{(#2 : #3)}}%
+			\IfNoValueTF{#1}{\exists}{\exists^{#1}_{0}} {\IfNoValueTF{#2}{#3}{(#2 \colon #3)}}%
 }}}
 \NewDocumentCommand{\sfn}{ O{1} O{\_} m m }{{\ensuremath{%
-			\ifstrequal{#2}{\_}{#3}{(#2 : #3)}%
+			\ifstrequal{#2}{\_}{#3}{(#2 \colon #3)}%
 			\ifstrequal{#1}{*}{\to}{\to_{#1}}% 
 			#4%
 }}}
 
 \NewDocumentCommand{\sfa}{ O{1} O{\_} m m }{{\ensuremath{%
-			\forall\ifstrequal{#2}{\_}{#3}{(#2 : #3)}% 
+			\forall\ifstrequal{#2}{\_}{#3}{(#2 \colon #3)}% 
 			\ifstrequal{#1}{*}{\to}{\to_{#1}} #4%
 }}}
 \NewDocumentCommand{\lrule}{mm}{\ensuremath{#1 \vvdash #2}}
@@ -111,6 +117,7 @@
 \def\missingcode{{\todo[missingcode]{Need code}}}
 \def\expandthis{{\todo[cleanup]{Expand more on this}}}
 \def\finishthis{{\todo[finish]{Finish this}}}
+\NewDocumentCommand{\addref}{o}{\IfValueTF{#1}{\todo{Add ref to #1}}{Add ref}}
 \def\marker #1 {{\todo[missingcode]{#1}}}
 \def\pred#1{{\ensuremath{\code{Pred} \ #1}}}
 \def\granule{Granule}
@@ -165,6 +172,8 @@
 \newcommand{\subform}{\sqsubseteq}
 \NewDocumentCommand{\apply}{m m}{\ensuremath{\code{#1} \ #2}}
 \NewDocumentCommand{\icat}{}{\code{Idr}}
+\NewDocumentCommand{\fadd}{mm}{{\ensuremath{#1 \oplus #2}}}
+\NewDocumentCommand{\fmul}{mm}{{\ensuremath{#1 \otimes #2}}}
 %%% Local Variables:
 %%% mode: LaTeX
 %%% TeX-master: "main"

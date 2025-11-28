@@ -1,0 +1,123 @@
+#+TODO: TODO(t) PROGRESS(p!) | POLISH(a!) HOLD(h@) DONE(d!) REMOVED(r@)
+#+TAGS: PROOF CITE WRITE
+
+* Introduction
+** Basics
+
+
+* Background [2/6]
+** PROGRESS Duplicate
+- [X] Copy
+- [ ] Clone
+** PROGRESS Linear Natural Numbers [0/2]                        :CITE:PROOF:
+- [ ] Regular Natural Numbers 
+- [ ] Linear Natural Numbers 
+** REMOVED Conatural numbers
+- State "REMOVED"    from "TODO"       [2025-11-23 Sun 22:05] \\
+  Changed co-mu to Stream
+** PROGRESS Pair Types [0/3]                                   :CITE:
+- [ ] Sigma types
+- [ ] Existential types
+- [ ] Sum types 
+** TODO Uniqueness Types
+** DONE Basic Categories
+- [X] ~Idr~
+- [X] ~Idr_1~
+
+
+
+* Mu Types [6/6]
+** DONE Basic formulation
+** POLISH Uniqueness of Mu                                               
+- [ ] Change proof to be nicer
+- State "POLISH"     from "DONE"       [2025-11-24 Mon 20:55]
+** DONE Mu as Grades                                                  :CITE:
+- State "DONE"       from "POLISH"     [2025-11-21 Fri 20:54]
+** DONE Operations on Mu [5/5]
+- State "DONE"       from "POLISH"     [2025-11-21 Fri 22:06]
+- [X] Add witness usage and constructability 
+- [X] ~join~
+- [X] ~expand~
+- [X] ~combine~
+- [X] ~split~ 
+** DONE [4/4] Applying Mu
+- State "DONE"       from "TODO"       [2025-11-21 Fri 21:57]
+- [X] Map
+- [X] App
+- [X] Push
+- [X] Pull
+** HOLD Co-Mu types
+- State "HOLD"       from "PROGRESS"   [2025-11-21 Fri 22:07] \\
+  Deciding if want to keep co-mu types
+
+
+
+* Formula language [3/5]
+** PROGRESS [#1] Formula Language                                    :PROOF:
+- [X] Affine nature
+- [ ] Categorical interpretation 
+** DONE [2/2] Core Formulas 
+- State "DONE"       from "PROGRESS"   [2025-11-28 Fri 15:40]
+- [X] ~Val~
+- [X] ~Var~
+** DONE [2/2] Binary Constructors
+- State "DONE"       from "PROGRESS"   [2025-11-28 Fri 15:40]
+- [X] ~Add~
+- [X] ~Mul~
+
+** DONE Formula syntax sugar
+
+- State "DONE"       from "TODO"       [2025-11-28 Fri 15:40]
+** PROGRESS Results about Formulas
+- State "PROGRESS"   from "TODO"       [2025-11-28 Fri 15:41]
+*** TODO Unification
+*** TODO Equivalence
+*** TODO ~[]~ as inital
+*** TODO ~()~ as terminal 
+* Omega Types [1/3]
+** TODO Basic Formulation
+*** TODO Basic Omega
+*** TODO General Omega
+*** TODO Benifits of General Omega
+
+** TODO Core Operations
+*** TODO Weakening
+*** TODO Forgetting
+*** TODO Generating
+
+** TODO [0/3] Other Operations
+*** TODO [0/4] Basic Ops
+**** TODO Combining
+**** TODO Joining
+**** TODO Splitting
+**** TODO Expanding
+*** TODO Mapping
+*** TODO Applying
+
+** TODO [/] Results about Omega
+*** TODO Generalizing Mu to Omega
+*** TODO Uniqueness of Omega
+*** TODO Equivalency of equals ~p ~ q => Omega p t w = Omega q t w~
+
+* Exponential types [0/4]
+** POLISH Basic Formulation
+- [ ] As repeated application
+- [ ] Expansion and combination
+** PROGRESS Graded Interpretation
+- [ ] Modeling multiple judgements 
+** TODO Numerical Interpretation
+- [ ] Commutativity 
+- [ ] Joining 
+** TODO Negative Exponenents
+
+
+* Practical Applications [0/1]
+** PROGRESS Usages
+
+
+* General TODOs [/]
+** Make formatting better
+- [ ] Fix typesetting of ~code~
+** TODO [/] Citations
+*** TODO Sigma, existential, and subset types
+** [#C] Update Code [/] 

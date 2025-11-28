@@ -5,135 +5,72 @@ Among these, Granule uses a resource algebra to model multiplicity \cite{quant_g
 However, a number of libraries in Haskell use the type system itself to model algebras \needcite{}. 
 
 It stands to reason then that it should be possible, with mu types and Idris' rich type system, to model the resource algebras of Granule.
-We propose that this is indeed possible with a definition of \code{Form'} types.
+We do this with \code{Form} types, which model formulas of natural numbers.
 
 \subsection{Formula Language}
+\label{sec:form_lang}
 
-\begin{definition}
-  \code{Form'} is a polymorphic type indexed by a \nat{}.
-  We also define a function, $\code{Eval'} : \fn<1> {\code{Form'} n}{\fn{\code{QVect} n \nat}{\nat}}$
-  Further, we define a function $\code{Solve'} : \fn<1>{\code{Form'} n}{\fn<1>{\nat}{\tpe}}$, which is defined as $\code{Solve'} \phi x \deq \et<1>[x]{\code{Form'} n}{\code{Eval'} \phi x \peq y}$.
-  In addition, we define $\code{Unify'} \phi \psi \deq \fa<1>[n]{\nat}{\fn{\code{Solve'} n \phi}{\code{Solve' n \psi}}}$
+Here, we attempt to model a simple affine arithmetic, a more general form of which appears in Granule \cite{quant_graded_modal}.
+To determine the interpreation of a given formula, which we call \code{Form}, we create a function $\ni$, which models the notion of a value being a ``possible result'' of the formula
+
+\begin{definition}[Formula Datatype]
+  \code{Form} is a simple datatype, with four\footnote{In reality, \code{FAdd} and \code{FMul} form one constructor which takes a opcode as an arguement, since they have the same signature} constructors:
+  \begin{itemize}
+  \item \code{FVar}, which takes no arguements, which models the notion of a ``variable''
+  \item \code{FVal}, which takes in one linear list of linear natural numbers, which models that notion of either a constant or a finite range of possible values
+  \item \code{FOp AddOp}, (which we alias as \code{FAdd}) which we write as $\oplus$, having two arguements, models the notion of adding together formulas
+  \item \code{FOp MulOp}, (which we alias as \code{FMul}) which we write as $\otimes$, having two arguemetns, which models the noiton of taking the product of formulas
+  \end{itemize}
 \end{definition}
 
-We will write $x \in \phi$ or $\phi \ni x$ for $\code{Solve'} \phi x$, and $\phi \subseteq \psi$ $\psi \supseteq \phi$ for $\code{Unify'} \phi \psi$. 
-Notably, this means that $\phi \subseteq \psi := \fa<1>[n]{\nat}{\fn{\phi \ni n}{\psi \ni n}}$.
-This allows us to consider formulas as ``sets'' of natural numbers, those being all their possible outputs. 
-We then say that a given number is ``in'' the formula if it is possible for it to be output, and a subset if every ``element'' is in the superset. 
-We define the interpretation of each constructor of \code{Form'} based off its branch of \code{Eval'}
+Likewise, the definition of $\ni$ is quite simple:
 
-This means that \code{Form'} forms a category on $\subseteq$
-\todo{Need proof}
-
-\subsection{The Core Formulas}
-
-The first \code{Form'} iS these is \code{FVar'}, which has the type $\code{Form'} 1$. 
-It models the notion of a singular variable in the formula.
-It evaluates as $\code{Eval'} \code{FVar'} [x] \deq x$, notably, however, this is the only branch, as the only possible index that \code{FVar'} can produce is 1.
-
-Of all the formulas, \code{FVar'} is the most general. 
-That is to say, it is the terminal object in the category of \code{Form'}. 
-
-\begin{lemma}
-  \label{lem:gen_var}
-  $\fsolve{\code{FVar'}}{n}$ is trivial.
-\end{lemma}
-\begin{proof}
-  This expands to $\fsolve[x]{\code{FVar'}}{n}$, which, if we have $(n, \alpha)$, where $\alpha$ is $\feval{\code{FVar'}}{n} \peq n$, which is trivial.
-\end{proof}
-
-The next of these, \code{FVal'}, models the notion of ``constants'' in formulas.
-It has the form $\code{FVal'} : \fn<1>{\nat}{\code{Form'} 0}$, and has the evaluation of $\code{Eval'} (\code{FVal'} n) [] \deq n$
-
-\subsection{The Binary Constructors }
-\label{sec:bin_cons}
-
-The remaining constructor models the notion of ``binary operations'' on \code{Form'}.
-It allows us to create a very basic tree of quantity expressions, which, combined with \code{FVal'} and \code{FVar'}, allow us to model literals, variables, and ``applications'' of either addition, multiplication, minimims and maximums to those formulas.
-
-It makes use of a enumeration type, \code{FOp}, which are attatched to each operation on two values.
-\begin{definition}
-  We define $\code{FOp} = + | - | min | max$, and also define \code{runOp} that has the type $\fn<1>{op} \fn<1>{\nat} \fn<1>{\nat} \nat$, such that we map the operation in \code{FOp} to its corresponding two arguement function
+\begin{definition}[Formula Usage]
+  $\ni$ is a predicate on a \code{Form} and \nat{} such that, $\phi \ni n$ can be defined for each $\phi$ as follows:
+  \begin{itemize}
+  \item If $\phi$ is $\code{FVar}$, then this is equivalent to $\top$.
+  \item If $\phi$ is $\code{FVal} x$, then $x \ni_{\code{List}} n$ is equivalent to $\phi \ni n$  
+  \item If $\phi$ is $\fadd{\phi_0}{\phi_1}$ then this is equivalent to $\sg<1>[x]{\nat} \sg<1>[y]{\nat} \sg{x + y \peq n} \sg{\phi_0 \ni x} \phi_1 \ni y$
+  \item If $\phi$ is $\fmul{\phi_0}{\phi_1}$ then this is equivalent to $\sg<1>[x]{\nat} \sg<1>[y]{\nat} \sg{x * y \peq n} \sg{\phi_0 \ni x} \phi_1 \ni y$
+  \end{itemize}
 \end{definition}
 
-\todo{Notation}
+Together, these model a formula language with wildcards, ranges, constants, addition, and multiplication.
 
-\code{FApp'} then takes that operations and applies it to two formulas.
-This allows us to create ``quantity expressions''.
-\begin{definition}
-  \code{FApp'} is of the type $\code{FApp'} : \fn<1>[op]{\code{FOp}} \fa<1>[a]{\nat} \fa<0>[b]{\nat} \fn<1>{\code{Form'} a} \fn<1>{\code{Form'} b} {(\apply{Form'}{(a + b)})}$.
-\end{definition}
-\missingcode{}
+\subsubsection{Formula Syntax}
+\label{sec:form_syntax}
 
-Note that we \emph{add} the number of variables in the types, and the first number is linear, not erased.
-This has to do with the system of variables in \code{Form'}: each variable can only occur once.
-While this does limit the power of \code{Form'}, it also makes it substaintally simplifies the solving of \code{Form'}.
+Often, these formulas are unnecasairlly long to write.
+For instance, if we want to write the formula whose only solution is $1$, we have to write out $\code{FVal} \left[ 1 \right]$, which is very long.
 
-This allows us to reason about formulas easily, because we know that each part of the formula can be solved independtly.
+It is for this reason that in the \thislib{} library, we define an interface \code{Formula}.
+This has only one function, which simply takes in the input value and outputs a formula.
+Then, whenever, we need to use a formula we simply apply that function (called \code{formula} that then outputs it).
+For instance, we define in the library an infix operator $\code{|+|}$, whose type is $\afa{\code{Formula} f} \afa{\code{Formula g}} \fn<1>{f} \fn<1>{g} \vform$, which is define in \ref{fig:add_mul_form_sugar}. 
+\begin{figure}
+    \label{fig:add_mul_form_sugar}
+    \begin{minted}{idris}
+        (|+|) : Formula f1 => Formula f2 => f1 -@ f2 -@ Form
+        (|+|) f1 f2 = FAdd (formula f1) (formula f2)
+        public export
+        (|*|) : Formula f1 => Formula f2 => f1 -@ f2 -@ Form
+        (|*|) f1 f2 = FMul (formula f1) (formula f2)
+    \end{minted}
+\end{figure}
 
-\begin{lemma}
-  If $\fsolve{\phi}{x}$, and $\fsolve{\psi}{y}$, then $\fsolve{\code{FApp'} op \phi \psi}{(\apply{runOp}{op}) x y}$. 
-\end{lemma}
+Some important things that are also formulas
 
-While this dosen't look very intuitive, this is simply the fact that $\fsolve{\phi + \psi}{x + y}$ and so on.
+\begin{itemize}
+\item Integers, which just map to $\code{FVal} \left[ n \right]$, where $n$ is the integer
+\item Lists of integers, which do similarly.
+\item The unit value, $\top$, which maps to $\code{FVar}$
+\item Functions of the form $\fn<1>{\code{Form}} f$, where $f$ can also be a formula, to just that applied to $\code{FVar}$
+\end{itemize}
 
-\begin{proof}
-  \todo{Proof}
-\end{proof}
-\subsection{Abstract Forms}
-\label{sec:abstract_form}
+\subsection{Unification Of Formulas}
+\label{sec:form_rel}
 
-While so far we have been dealing with formulas with explicit numbers of variables.
-However, we almost never actually care about the inputs to a formula, we care only about the outputs.
-Neither $x \in \phi$ or $\phi \subseteq \psi$ is dependent on the type of the given formulas.
-So, rather than dealing with the ``concrete'' types, we instead deal with an abstract type, \code{Form}, which is a dependent linear pair of the form $\sg<1>[n]{\nat} (\code{Form'} n)$.
-
-We then apply equivalents to each operation that works on \code{Form} instead of \apply{Form'}{n}, and there name is the respective operation, merely with the prime dropped from the end
-We also define $\code{Solve}$ and $\code{Unify}$, which are defined likewise.
-Finally, we use the same notation for $\code{Form}$ as $\code{Form'} n$, $5$ for $\apply{FVal}{5}$, $\phi + \psi$ for $\code{FAdd} \phi \psi$, and $x \in \phi$ for \code{Solve} and $\phi \subseteq \psi$ for $\code{Unify} \phi \psi$.
-
-Altogether, the formula language is as follows:
-
-\begin{bnf}
-  op ::= | $+$ | $*$ | min | max ;;
-  $\phi$ : Form ::=
-  | $n$ : Number
-  | $\_$ : Variable
-  | $\phi$ op $\phi$ : Application
-\end{bnf}
-
-\subsection{Decidability of Formulas}
-\label{sec:form_dec}
-
-One of the reaons this specific set of formula types was chosen is that it allows for $\fsolve{\phi}{n}$ to be provably terminadbly decidable for any formula and natural number.
-That is, their is a total function \code{DecSolve} from a formula and natural number to either $\fsolve{\phi}{n}$ or a proof that it is absurd
-
-We prove this by case anaylisis and induction.
-Firstly, we have the two base cases:
-
-\begin{lemma}
-  \label{lem:dec_fvar}
-  $\fsolve{\code{FVar'}}{n}$ is decidable.
-\end{lemma}
-\begin{proof}
-  This reduces to $\fsolve[x]{\code{FVar'}}{n}$, which simply has $(n, \code{Refl})$.
-\end{proof}
-
-\begin{lemma}
-  \label{lem:dec_fvar}
-  $\fsolve{\code{FVal'} v}{n}$ is decidable.
-\end{lemma}
-\begin{proof}
-  This reduces to $\fsolve[x]{\code{FVal' v}}{n}$, which further reduces to $\et<1>[x]{\nat} (v \peq n)$, and, as natural number equality is decidable, is decidable
-\end{proof}
-
-Their are 4 more inductive cases, one for each operation.
-
-However, first, we must define the induction hypothesis.
-Because for each case they are exactly the same, we note them all here.
-\subsection{Formula Syntax Sugar}
-\label{sec:formulaic}
-
+While $\fsolve{\phi}{n}$ relates a formula and a number, often we want to relate two formulas
 
 %%% Local Variables:
 %%% mode: LaTeX

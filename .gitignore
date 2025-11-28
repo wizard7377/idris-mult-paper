@@ -329,7 +329,6 @@ _minted
 
 *.pdf
 
-!main.pdf
 
 **_region**
 .vscode
@@ -340,3 +339,17 @@ _*
 *.ist
 main.prv/
 .vscode/
+
+
+
+!main.pdf
+!*.tex
+!style/
+!code/
+!LICENSE
+!CITATION.cff
+!README.md
+!*.sty
+!*.bib
+!src/
+!Paper.org

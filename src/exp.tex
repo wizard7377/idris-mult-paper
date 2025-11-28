@@ -50,8 +50,18 @@ However, they maintain all the utility of terms while having the full flexibilit
 Granted, they have one major problem.
 Namely, operations that split them have the same restrictions as described in \ref{fig:bad_expand}.
 In addition, the combine rule has an additional restriction: the exponenets must have the same witness.
+
 This is because we can no longer guarntee that two exponentials having the same type means that they provide the same value.
 
+All in all, we define these as having the following types:
+\begin{figure}
+  \begin{align}
+    \label{eq:exp_defs}
+    \code{combine}_{\code{Exp}} &\colon \fn<1>[x]{\txp{\phi}{t}} \fn<1>[y]{\txp{\psi}{t}} \afa<0>{x_1 \peq y_1} \txp{\phi+\psi}{t} \\
+    \code{split}_{\code{Exp}} &\colon \fa<1>[n]{\nat} \fa<1>[m]{\nat} \fn<1>{\txp{m+n}{t}} (\sg<1>{\txp{m}{t}} \txp{n}{t}) \\
+    \code{expand}_{\code{Exp}} &\colon \fa<1>[n]{\nat} \fa<1>[\phi]{\vform} \fn<1>{}
+  \end{align}
+\end{figure}
 \subsection{The type of Strings Squared}
 \label{sec:num_exp}
 
@@ -60,8 +70,7 @@ As has been noted before, linear exponential types have a very nice interpretati
 \begin{figure}
   \label{fig:num_exp}
 \begin{align}
-  t^{n + 1} &\liso (\sg<1>{t} t^n) \\
-  t^0 &\liso \mathbf{1} \text{When $t$ is not $\mathbf{0}$} \\
+  t^0 &\liso \mathbf{1} \ \text{When $t$ is not $\mathbf{0}$} \\
   \mathbf{0}^n &\liso \mathbf{0} \\
   t^1 &\liso t \\
   \mathbf{1}^n &\liso \mathbf{1}
@@ -73,11 +82,12 @@ Given that $\mathbf{0} = \bot$, and $\mathbf{1} = \top$.
 \begin{remark}
   All the properties in \ref{fig:num_exp} are true.
 \end{remark}
-\begin{proof}
-  The first of these is the only one that is truelly ``diffucult''. However, since we \emph{can} define splitting of finte values, this is not incredibly diffucult.
-  The rest of the proofs somewhat simply follow
+\begin{proof} 
+  The the proofs somewhat simply follow.
   \begin{itemize}
-  \item $\txp{0}{t}$ simply reduces to $\txp[w][n]{0}{t}$, which 
+  \item $\txp{0}{t}$ simply reduces to $\txp[w][n]{0}{t}$, which is trivially solveable due to \addref
+    \item 
+  
   \end{itemize}
 \end{proof}
 \subsection{Inverting Types}
