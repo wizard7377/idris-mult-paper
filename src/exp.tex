@@ -1,46 +1,98 @@
-\section{Exponential and Existential Types}
+\section{Exponential Types}
 
-While the $M$ and $\Omega$ types bear much insert theoretically, they, by themselves, have little practical use.
-This is because as demonstrated in \ref{sec:grade_mu}, these types model the \emph{judgments} about graded modalities, not the graded modalities themselves.
+Linear exponential types have been noted previously to be equivalent to a certain number of bindings of a value.
+Indeed, this is why they are called \emph{exponential} types, as, say, $\code{String}^3$ models $\code{String} \times \code{String} \times \code{String}$.
+Here, we construct $\code{Exp}$, which models exponential types using $\Omega$ types abstracted over their witness.
+This allows us to transform the $\Omega$, which requires a witness of the value, to something more closely resembling the type of graded value \emph{themselves}.
 
-Fortunately, however, we can define a simple abstraction over them that allows them to behave more like true graded modalities at the term level.
-To do this, we must first introduce a linear existential type.
-A regular existential type is a dependent pair type that "doesn't care" about its first argument. 
-In Idris 2, we can make the that fact part of the programming by giving the first argument a multiplicity of zero.
+\begin{definition}[Exponential Types]
+  \label{def:exp_type_core}
+  \code{Exp} is a type function indexed on a formula, $\phi$, and type, $t$, with the definition of $\code{Exp} \phi t \deq \et<1>[w]{t} {(\tw{\phi}{t}{w})}$.
+\end{definition}
 
-Idris 2 actually defines an existential type, however, it has the second argument have a multiplicity of $\omega$, while we want it to have a multiplicity one.
-Fortunately, the modification of \ident Exists to our type, \ident LExists , is quite trivial\footnote{Idris, however, seems to have trouble correctly linearlizing constructor accessors, so we define the actual \ident fst and \ident snd accessors separately}, and we define it in \ref{lst:def_lexists}
+We also, as the name suggests, employ a terse notation using the syntax sugar described for formulas earlier \ref{sec:formulaic} to write these more expressivly.
 
-\begin{listing}
-	\begin{minted}{idris}
-		record LExists {ty : Type} (f : (ty -> Type)) where
-			constructor LEvidence
-			0 fst' : ty 
-			1 snd' : f fst'
-	\end{minted}
-	\caption{The definition of \ident LExists }
-	\label{lst:def_lexists}
-\end{listing}
+\begin{notation}
+  We write $t \carat \phi$, where $\phi$ is a formula-like object and $t$ is a type for $\code{Exp} \phi t$, and, for an even simpler syntax, $t^\phi$. 
+\end{notation}
 
-We can also define mapping like how Idris defines the mapping, with the signature described in \ref{lst:def_lex_map} \cite{idris_base}.
+This syntax allows us to write, say $t^2$ for $\code{Exp} {(\code{Given} 0 \code{FVal'} (S (S 0)))} t$, which is obviously much clearer \footnote{Obviously, this example is a little bit ridiculos, as we already have, say, $2 \peq (S (S 0))$, but it still is true that this is a more terse syntax}.
 
-\begin{listing}
-	\begin{minted}{idris}
-		map : 
-			{0 p : a -> Type} -> 
-			{0 q : b -> Type} -> 
-			{0 m : (a -> b)} -> 
-			(1 f : forall x. p x -@ q (m x)) -> 
-			(LExists p -@ LExists q)
-		map f (LEvidence x y) = LEvidence (m x) (f y)
-	\end{minted}
-	\caption{Definition of \ident map for \ident LExists }
-	\label{lst:def_lex_map}
-\end{listing}
- 
-\subsection{Existential Crisis (Solution)}
+\subsection{Exponential Types as Graded Values}
+\label{sec:exp_grade}
 
-This principle issue with using $M$ and $\Omega$ in practice is that
+Exponential types serve the primary purpose of modeling linear values, rather than the bindings of those values.
+So, for instance, the granule type $\code{String} [2]$ is modeled by $\code{String}^2$
+One of the most important facts about exponential types is that they are functorial over \emph{both} their first and second arguements\footnote{With respect to $\subseteq$}.
+
+\begin{lemma}
+  Exponential types have a function ${\code{map}_{\code{Exp}}}_{2} : \fa<0>[p]{\fn<1>{t} u} \fn<1>{(\fa<0>[w_t]{t} \fn<1>{\tw{\phi}{t}{w_t}} \tw{\psi}{u}{(p w_t)})} {\fn<1>{\txp{\phi}{t}} \txp{\psi}{u}}$ \footnote{Note that when we want to disambitguate among \musym and \omegasym and $\code{Exp}$ types, we use a subscript to differentiate them}
+\end{lemma}
+\begin{proof}
+  For ${\code{map}_{\code{Exp}}}_{2} f x$, we have $Given (p x_{1}) (\map_{\Omega} f x_{2})$
+\end{proof}
+
+Next, and slightly more interesting, is that over the second 
+\begin{lemma} 
+  Exponential types have a function ${\code{map}_{\code{Exp}}}_{1} : \afa<0>{\phi \subseteq \psi}{\fn<1>{\txp{\phi}{t}} \txp{\psi}{t}}$ (we call this \code{weaken})
+\end{lemma}
+\begin{proof}
+  We simply have \todo{Finish}
+\end{proof}
+
+And therefore, we have \todo{Add bimap}.
+We can also state that the initial object in the category of exponential types is $\bot^n$, as the inital category of types is $\bot$ and the inital formula is just a variable.
+
+This shows something very important, exponential types allow us to model graded values using only linear types, but rather than modeling them as judgements, viewing them as types.
+In essence, the only reason that we need the witness is to ensure that all the values are the same.
+However, they maintain all the utility of terms while having the full flexibility of $\Omega$ types.
+
+Granted, they have one major problem.
+Namely, operations that split them have the same restrictions as described in \ref{fig:bad_expand}.
+In addition, the combine rule has an additional restriction: the exponenets must have the same witness.
+
+This is because we can no longer guarntee that two exponentials having the same type means that they provide the same value.
+
+All in all, we define these as having the following types:
+\begin{figure}
+  \begin{align}
+    \label{eq:exp_defs}
+    \code{combine}_{\code{Exp}} &\colon \fn<1>[x]{\txp{\phi}{t}} \fn<1>[y]{\txp{\psi}{t}} \afa<0>{x_1 \peq y_1} \txp{\phi+\psi}{t} \\
+    \code{split}_{\code{Exp}} &\colon \fa<1>[n]{\nat} \fa<1>[m]{\nat} \fn<1>{\txp{m+n}{t}} (\sg<1>{\txp{m}{t}} \txp{n}{t}) \\
+    \code{expand}_{\code{Exp}} &\colon \fa<1>[n]{\nat} \fa<1>[\phi]{\vform} \fn<1>{}
+  \end{align}
+\end{figure}
+\subsection{The type of Strings Squared}
+\label{sec:num_exp}
+
+As has been noted before, linear exponential types have a very nice interpretation as numerical exponentials, namely, the following is always true
+
+\begin{figure}
+  \label{fig:num_exp}
+\begin{align}
+  t^0 &\liso \mathbf{1} \ \text{When $t$ is not $\mathbf{0}$} \\
+  \mathbf{0}^n &\liso \mathbf{0} \\
+  t^1 &\liso t \\
+  \mathbf{1}^n &\liso \mathbf{1}
+\end{align}
+
+\end{figure}
+Given that $\mathbf{0} = \bot$, and $\mathbf{1} = \top$.
+
+\begin{remark}
+  All the properties in \ref{fig:num_exp} are true.
+\end{remark}
+\begin{proof} 
+  The the proofs somewhat simply follow.
+  \begin{itemize}
+  \item $\txp{0}{t}$ simply reduces to $\txp[w][n]{0}{t}$, which is trivially solveable due to \addref
+    \item 
+  
+  \end{itemize}
+\end{proof}
+\subsection{Inverting Types}
+\label{sec:exp_inv}
+
 
 %%% Local Variables:
 %%% mode: LaTeX

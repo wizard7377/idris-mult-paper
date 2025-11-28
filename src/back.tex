@@ -1,55 +1,126 @@
 \section{Background}
 
-There are a couple constructions we must first define before we discuss the results posited here, however.
-Among these are the linear natural numbers, cloning and dropping, as well as existential types
+\subsection{Copying Linear Values}
+\label{sec:copy_drop}
 
-\subsection{Linear Natural Numbers}
+Girard's original linear logic has one very large problem\footnote{for usage as a language}, the fact that there is no way to ``duplicate'' premises \cite{linear_logic}.
+While this seems like a non-issue, there are some cases where this is completely inadmissible.
+For instance, consider the natural numbers.
+Using only the logic, it is impossible to define multiplication on two simple linear natural numbers.
 
-While linear values are quite useful in of themselves, they have one very large problem, the fact that reflection about them is limited.
-This is particarly problematic with linear natural numbers, which we define here as \ident QNat in \ref{lst:def_qnat}.
+This is because if we define multiplication as $0 * n = 0$ and $(S m) * n = (m * n) + n$, this will, unless $m = 1$, have more (or less) than one usage of $n$.
+That is, we cannot ensure that we can use the variable mutiple times.
+Most interestingly, however, is that this models something important: the cloning of memory.
+In a language like Rust (excluding the fact that numbers are \code{Copy}) we can't use a value arbitrary many times.
+
+However, unlike Rust, we cannot have a simple $\code{Clone}$ trait.
+This is because $\code{Clone}$ has a side effect: it has to be in a region (which is equivalent to having an effect) \cite{flix_paper}. 
+In addition, we wouldn't be able to perform equality reflection on the values.
+
+\begin{definition}[Copying Values]
+  \code{Copy} is an interface, indexed on a type, $t$, such that there is a function $\code{copy} : \fn<1>[f]{(\fn<1>[x]{t} \fn<1>[y]{t} (p x y))} \fn<1>[z]{t} (p z z)$
+\end{definition}
+ 
+
+\begin{figure}
+	\begin{prooftree}
+		\hypo{\Gamma , (x : t) , (y : t) , x \peq y \vdash (p x y) } 
+		\infer1[Copy]{\Gamma, (z : t) \vdash (p z z) }
+	\end{prooftree}
+	\label{fig:back_copy}
+	\caption{The copy rule}
+\end{figure}
+
+In other words, take a function that requires two of the same value, and then just use the same value twice, noting its equality
+
+We also have a much simpler drop trait (whose name is also taken from Rust) which given a value destroys it.
+In Idris, this just means it pattern matches against it, returning no useful operation, which can be represented by the existence of a function $\code{drop} : \fn<1>[x]{t} \top$.
+For instance, we can define $\code{Drop} (x = y)$, because there is only one possible constructor, \code{Refl}.
+
+Most values are \emph{both} copyable and dropable.
+Any datatype (or product or sum type) will be dropable if all their components are, and the same for copyable.
+The only two notable things that are not dropable or copyable are
+\begin{itemize}
+\item \code{Type}, as we cannot construct every possible case
+\item Functions, as this would require a way to ``use'' a function, which is not in general possible ($\bot -> \alpha$)
+\end{itemize}
+
+\paragraph{Cloning}
+
+In practice, however, this definition can be quite diffucult to work with %FINISH
+
+\subsection{Linear Functions on Numbers}
+
+While Idris' does have a linear library, there are a couple problems with the support for linear bindings:
+\begin{itemize}
+\item These are not as well developed as their unrestricted counterparts
+\item They can't be converted to their unrestricted counterparts
+\end{itemize}
+
+One of the best examples of this is the natural numbers.
+Clearly, for any binding of $2$, we expect that to be exactly one binding of $1$ inside a succesor function.
+However, this is not the case, rather, Idris by default has it so that data constructor arguements are unrestricted by default.
+This is very important for a case like the natural numbers, where this is taken to the extreme, it is almost always impossible to talk about the \code{Nat} datatype in a useful way with linear bindings.
+
+The solution to this, then, is to define the \emph{linear} natural numbers.
+While the linear library also defines \code{LNat}, we also don't use that, because of the fact that, again, it relies on the \code{Copies} construction, in addition to already not having that large of an implementation to begin with.
+Granted, our version is almost exactly the same, and is defined as follows:
+
 
 \begin{listing}
 	\begin{minted}{idris}
-		data QNat : Type where
-			Zero : QNat
-			Succ : (1 k : QNat) -> QNat
+        data QNat : Type where
+            Zero : QNat
+            Succ : (1 k : QNat) -> QNat
 	\end{minted}
-	\caption{The definition of \thislib's natural numbers}
+	\caption{Definition of linear natural numbers}
 	\label{lst:def_qnat}
 \end{listing}
 
-While addition is fine, once we get to multiplication we begin using one of the variables are variable amount of times. 
-The \citetitle{idris_linear} library solves this by using inference to essientally clone the first value. 
-Here, however, we opt for a different mechanism, that allows for easier reflection.
-Namely, we use the fact that erased functions are free to disregard multiplicities, and thence define a pair of multiplication functions, \code{lmul} and \code{lmul'}.
+The rest of the operations use a model as close to the simple inductive definitions as possible, using \code{copy} instead of the more complex \code{duplicate}.
 
-The first of these is the unrestricted ``runtime'' version of it, and its definition is \emph{not exported}.
-The second of these is the erased ``reflectable'' version of it, who's definition follows the usual structure for natural numbers, and is much easier to infer about.
-We then define an assumption \code{mulRep} which is of the form $\code{lmul} \peq \code{lmul'}$, and thereby can prove things about \code{lmul} through simpler proofs on \code{lmul'}
+\begin{theorem}[Finite Initial]
+  \label{thm:fin_init}
+  There is a finite list of all the inhabitents of $\sg<1>[n]{\nat} (n \leq v)$, where $z : \nat$
+\end{theorem}
+\begin{proof}
+  TODO
+\end{proof}
 
-\subsection{Existential Types}
+\subsection{Dependent Pairs}
 
-Existential types, in regards to dependent types, usually refers to dependent pair ($\Sigma$) types \cite{hottbook}.
-In this context, we see the first element of the pair as ``evidence'' for the type of the second element of the pair.
-In Idris, this is formalized (in \idris's \citetitle{idris_base}) by stating that the first arguement is runtime erased, in a similar way to which universal quantifiaction is a function that is erased.
+As is common, in Idris, existentials are modeled as a dependent pair \cite{hottbook} \cite{hott_sets}.
+With Idris, however, there is an extra portion to this.
+Specifically, we can also change the multiplicity of the first and second element of the pair.
+In addition, we can chose to make these linear, unrestricted, or erased.
+Because one of the central goals of this is to create a system that does not use unrestricted bindings, we focus only on the linear and erased possibilities.
 
-However, for our usage here this is not suitaible, as we are dealing with principally linear values, and \ident Exists is unrestricted.
-Fourtanetly, however, the change from unrestricted to linear existentials is quite trivial, the construction of which may be found at \ref{lst:def_lexists1}
+The possible combinations, and their names in Idris, as well as their constructors, are given below
+\begin{tabular}{|c || c | c|}
+    \hline{}
+    & $0$ & $1$ \\
+    \hline{}
+    $0$ & $\Sigma^1$, \code{Sigma}, \code{For} & $\exists^1$, \code{Exists}, \code{Given} \\
+    \hline{}
+    $1$ & $\Sigma^0$, \code{Subset}, \code{Elem} & $\Sigma^1$, \code{Sigma}, \code{For} \\
+    \hline{}
+\end{tabular}
 
-\begin{listing}
-	\begin{minted}{idris}
-		record Exists (t : Type) (p : (t -> Type)) where
-			constructor Evidence
-			0 fst' : t 
-			1 snd' : p fst'
-	\end{minted}
-	\caption{Definition of linear existentials}
-	\label{lst:def_lexists1}
-\end{listing}
+We write all of these with the same ``typebind'' shorthand, which, when binding application is added, will allow the above to be written as $\code{For} (x : \nat) | (x \peq x)$, for instance \cite{binding_app}.
 
-Not much is notable about this, we define the operations as is usual, except every time a function would be unrestricted over the second value it is instead linear.
-We also have a operator, \code{\#?}, which serves as sugar for this, using \idris's \ident typebind , mechanism.
+Each of these has different parts of the pair being ``inspected''.
+In an existential statement, we don't care about the scurutinee, so that is irrelevant.
+Subset, with its notion of refinement types, dosen't particularly care about the second elements proof, only that it exists.
+Finally, $\Sigma$ represents the ``traditional'' dependent pair, were we (might) care about both elements, and so both of them are linear.
 
+Note that because of the nature of erased bindings, there isn't a difference between a type that has only erased at runtime and an bindings that is $0$, so $\Sigma^1$ models both the linear and erased pair.
+
+\subsection{Notable Categories}
+\label{sec:idr_cat}
+
+In Haskell, it is common to refer to the category encompassing all of Haskell as \code{Hask}
+Here, we do a similar thing, exact for the category of Idris 2 types with functions as morphisms, we call \icat{}.
+In addition, for the category of Idris 2 types with linear functions as morphisms, we write $\icat^1$.
 
 %%% Local Variables:
 %%% mode: LaTeX

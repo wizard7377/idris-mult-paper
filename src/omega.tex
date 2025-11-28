@@ -1,23 +1,44 @@
-
 \section{Omega Types}
 
-\label{sec:omega_types}
+While $\musym$ types allowed us to construct a way to model non-linear restricted multiplicites, they don't give us the full power of a system like Granule.
+This is because a system like GrTT admits arbitrary multiplicity polymorphism.
 
-The principle use of \code{Form} here is as part of the $\Omega$ construction, which uses it to constraint over mutliplicity, thereby giving us an equivalent of \granule effect formulas,
+The simple solution to this is to bundle multiplicity polymorphism, using effect formulas, into a single type.
+We call this type $\Omega$, and it generalizes mu to arbitrary effect formulas.
 
-\subsection{Poly-multiplicative Judgments}
+\subsection{Free and Forgetful Bindings}
+\label{sec:omega_def}
 
-\begin{definition}
-	\label{def:Omega_ty}
-	$\Omega$ is a type indexed by a formula, $\phi$, a type $t$, and a witness of that type, such that $\tw \phi t w \deq_0 \tw_n \phi t w$
-\end{definition}
 
-That is, an $\Omega$ designates a function from a natural number to a certain number of $t$.
-However, this is often unedsierable, so we instead efine a helper function, reify, of the type $\fn_1{\tw \phi t w}{\fa_1[n]{\nat}{\afa_0{(n \in \phi)}{\tm n t w}}}$, which, allows for us to instead consider if the number in is in the ``solution set'' as opposed to a value projected to.
-  
-The most simple form of $\Omega$ is that where $\phi$ is \code{FVar} and thus is simply, $\tw_n {\code{FVar}} t w$, or simply $\tw* n t w$, which we specifically call $\omega t w$, and $\omega t w \deq_0 \tw* n t w$
+There are two ways that we can define an $\Omega$ type, depending on whether we want it to be able to rember its structure or not.
+These both have the exact same type signature, both having the types of $\fn<1>[p]{\vform} \fn<1>[t]{\tpe} \fn<1>[w]{t} \tpe$.
+We call the forgetful version, which is a type family, $\Omega '$ (\code{Omega'} in the library) and the free version, which is a datatype, $\Omega$ (\code{Omega} in the library).
+Both of these are intended, for the arguement listed above, a way to represent $\tm{n}{t}{w}$, where $n$ is any solution to $p$.
 
-%END OF SET E
+\subsubsection{Forgetful Omega}
+
+The first of the is the forgetful way.
+This way is the simpler of the two.
+It simply is defined as follows:
+
+\begin{figure}
+  \begin{align}
+    \label{eq:omega'_def}
+    $\Omega' \ p \ t \ w \deq \fa<1>[n]{\nat} \afa<0>{
+    \left(
+    \fsolve{p}{n}
+    \right)} \tm{n}{t}{w}$
+  \end{align}
+\end{figure}
+
+This is perhaps simplest for the special case of $p$ being $()$.
+When $p$ is a free variable, the second arguement trivially exists, and therefore this just becomes $\fa<1>[n]{\nat} \tm{n}{t}{w}$.
+That is it becomes a way to generate however many bindings we would like.
+Then, by varying $p$, we restrict the set of possible bindings to only those whose number is a solution to $p$, so for instance, $\Omega [0,1] t w$ models the notion of a value that may or may not be used.
+
+\subsubsection{Free Omega}
+
+
 
 %%% Local Variables:
 %%% mode: LaTeX

@@ -127,7 +127,7 @@ acs-*.bib
 *.sls
 
 # uncomment this for glossaries-extra (will ignore makeindex's style files!)
-# *.ist
+*.ist
 
 # gnuplot
 *.gnuplot
@@ -329,9 +329,27 @@ _minted
 
 *.pdf
 
-!main.pdf
 
 **_region**
 .vscode
 *~
 _*
+
+*.log
+*.ist
+main.prv/
+.vscode/
+
+
+
+!main.pdf
+!*.tex
+!style/
+!code/
+!LICENSE
+!CITATION.cff
+!README.md
+!*.sty
+!*.bib
+!src/
+!Paper.org

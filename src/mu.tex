@@ -7,13 +7,13 @@ The definitions of this in Idris are given at \ref{lst:mu_def}.
 
 \begin{definition}
 	$M$ is a polymorphic type with signature 
-	$M : \oldfn(S m') n : \nat . \oldfn0 t : \tpe . \oldfn0 w : t . \tpe$
+	$M : \fn[n]{\nat}{\fn[t]{\tpe}{\fn[w]{t}{\tpe}}}$
 \end{definition}
 
 In addition, $M$ has two constructors
 
 \begin{definition}
-	There are two constructors of $M$, $\mz$ \code{MZ}, and $\odot$, \code{MS}, Which have the signatures $\mz : \tm n t w$ and $\ms : \oldfn1 w : t . \oldfn1 \_ : {\tm n t w} . \tm {(S n)} t w$ 
+	There are two constructors of $M$, $\mz$ \code{MZ}, and $\odot$, \code{MS}, Which have the signatures $\mz : \tm n t w$ and $\ms : \fn<1>[w]{t}{\fn<1>{\tm n t w}{\tm {(\code{Succ} n)} t w}}$ 
 \end{definition}
 
 Firstly, it should be noted that the names were chosen due to the fact that the indices of them are related. 
@@ -21,13 +21,13 @@ That is, $\mz$  or ``mu zero'' will always be indexed by $0$, and $\ms$, ``mu su
 
 \begin{listing}
 	\begin{minted}{idris}
-		data Mu : (n : Nat) -> (t : Type) -> (w : t) -> Type where
+		data Mu : (n : QNat) -> (t : Type) -> (w : t) -> Type where
 			MZ : 
-				Mu Z t w
+				Mu 0 t w
 			MS : 
 				(1 w : t) -> 
-				(1 xs : (Mu n t w)) -> 
-				Mu (S n) t w
+				(1 xs : Mu n t w) -> 
+				Mu (Succ n) t w
 	\end{minted}
 	\caption{The definition of $M$ in Idris}
 	\label{lst:mu_def}
@@ -38,16 +38,20 @@ That is, $\mz$  or ``mu zero'' will always be indexed by $0$, and $\ms$, ``mu su
 \end{remark}
 
 Intuitively, $M$ represents $n$ copies of $t$, all with the value $w$, very much inspired by the paper \citetitle{inverse_of_type}.
-For instance, if we want to construct $x : \tm 2 {\code{String}} \verb|"value"|$, we can only construct this through \ms, an we know, bu nothing but the first argument of the value, that we must take as a initial argument $\verb|value|$, and as a second value of the form $\tm 1 \code{String} \verb|"value"|$, which we then repeat one more time and get another \verb|"value"| an finally we match $\tm 0 {\code{String}} \verb|"value"|$ and get that we must have $\mz$. 
+For instance, if we want to construct $x : \tm 2 {\code{String}} \verb|"value"|$, we can only construct this through \ms, an we know, but nothing but the first argument of the value, that we must take as a initial argument $\verb|value|$, and as a second value of the form $\tm 1 \code{String} \verb|"value"|$, which we then repeat one more time and get another \verb|"value"| an finally we match $\tm 0 {\code{String}} \verb|"value"|$ and get that we must have $\mz$. 
 
-We can then say that we know that the only constructors of $\tm 2 {\code{String}} \verb|"String"|$ is $\verb|"value"| \ms \verb|"value"| \ms \mz$. Note the similarity between the natural number and the constructors. 
+We can then say that we know that the only constructors of $\tm 2 {\code{String}} \verb|"String"|$ is $\verb|"value"| \ms \verb|"value"| \ms \mz$. 
+Note the similarity between the natural number and the constructors. 
 Just as we get 2 by applying \code{S}twice to \code{Z}, we get $\tm 2 {\code{String}} \verb|"value"|$ by applying $\ms$ twice to $\mz$. 
 This relationship between $M$ types and numbers is far more extensive, as we will cover later. 
 
 The \code{w}index or ``witness'' is the value being copied.
-Notably, if we remove the \code{w}index, we would have $\mz : M n t$, and $\ms : t \to_1 M n t \to_1 M (S n) t$, which is simply \code{LVect.}
+Notably, if we remove the \code{w} index, we would have $\mz : M n t$, and $\ms : t \to_1 M n t \to_1 M (S n) t$, which is simply \code{LVect.}
 The reason that this is undesirable is that we don't want this as it allows for $M$ to have heterogeneous elements. 
 However, if we are talking about ``copies'' of something, we know that should all be the exact same.
+One important fact about \musym{} is we can always ``lower'' a unrestricted value into \musym{}.
+That is, there is a function $\code{gen} : \fn<\omega>[w]{t} \tm{n}{t}{w}$.
+Unfourtanetly, because Idris dosen't have a way to ``thread'' together infinite linear values to get an unrestricted one, the inverse of this does not exist.
 
 There are two very basic functions that bear mention with respect to $M$. The first of these is \code{witness}, which is of the form $\code{witness}:_0 \oldfa0 w : t . \tm n t w \to t$.
 Note that this is an \emph{erased} function.
@@ -56,9 +60,11 @@ In addition, we also have $\code{drop}: \fn{{\tm 0 t w}}{\top}$, which allows us
 Its signature is simple $\code{drop}\mz \deq ()$.
 
 Finally, we have \code{once}, which takes a value of form $M 1$ and extracts it into the value itself.
-It has a signature $\code{once}: \oldfn1 \_ : \tm 1 t w . t$, where we have $\code{once}(x \ms \mz) \deq x$
+It has a signature $\code{once}: \fn<1>{\tm 1 t w}{t}$, where we have $\code{once}(x \ms \mz) \deq x$
+
 
 \subsection{Uniqueness}
+
 
 While \code{w}serves a great purpose in the interpretation of $M$ it perhaps serves an even greater purpose in terms of values of $M$.
 We can, using \sigil w, prove that there exists exactly one inhabitant of the type $\tm n t w$, so long as that type is well formed.
@@ -70,8 +76,8 @@ We can, using \sigil w, prove that there exists exactly one inhabitant of the ty
 \end{lemma}
 \begin{proof}
 	Induct on \sigil n, the first case, $\tm 0 t w$, contains zero applications of \ms, as it is \mz.
-	The second one splits has $x : M (S n') t w$, and we can destruct on the only possible constructor of $M$ for $S$, $\ms$, and get $y :_1 t$ and $z :_1 M n t w$ where $x \peq (y \ms z)$. 
-	We know by the induction hypothesis that $z$ contains exactly $n'$ uses of $\ms$, and we therefore know that the constructor occurs one more times then that, or $S n'$
+	The second one splits has $x : \tm {(S m')} t w$, and we can destruct on the only possible constructor of $M$ for $S$, $\ms$, and get $y :_1 t$ and $z :_1 M n t w$ where $x \peq (y \ms z)$. 
+	We know by the induction hypothesis that $z$ contains exactly $n'$ uses of $\ms$, and we therefore know that the constructor occurs one more times than that, or $S n'$
 \end{proof}
 
 This codifies the relationship between $M$ types and natural numbers.
@@ -112,10 +118,10 @@ This is equivalent to the statement ``there exists at most one $M$'' \needcite.
 
 \todo[cleanup]{Finish proof}
 
-However, we can make a even more specific statement, given the fact we know that $w$ is an inhabitant of $t$.
+However, we can make an even more specific statement, given the fact we know that $w$ is an inhabitant of $t$.
 \begin{theorem}[Uniqueness]
 	\label{thm:unique}
-	If $\tm n t w$ is well formed, then it must have \emph{exactly} one inhabitant.
+	If $\tm n t w$ is well-formed, then it must have \emph{exactly} one inhabitant.
 \end{theorem}
 \begin{proof}
 	We know by \ref{lem:all_eq} that there is \emph{at most} one inhabitant of $\tm n t w$. 
@@ -128,18 +134,29 @@ However, we can make a even more specific statement, given the fact we know that
 	Given that we can prove that there must be at least and at most one inhabitant, we can prove that there is exactly one inhabitant.
 \end{proof}
 
-This is very important for proofs on $M$.
+This is very important for proofs on \musym.
 It corresponds to the fact that there is only one way to copy something, to provide another value that is the exact same as the first.
 
+One important derivation of this is that if $\musym n t w$ is well formed, we can \emph{always} construct an inhabitant of it.
+
+\begin{lemma}[Examples of Mu]
+  \label{lem:example_mu}
+  There is a erased function, $\code{Example} : \fa<0>[n]{\nat} \fa<0>[t]{\tpe} \afa<0>[w]{t} \tm{n}{t}{w}$
+\end{lemma}
+\begin{proof}
+  This is a trivial corrallary of \ref{thm:unique}
+\end{proof}
+
 \subsection{Graded Modalities With Mu}
+
 
 \label{sec:grade_mu}
 A claim was made earlier that $M$ types can be used to model graded modalities within QTT.
 The way it does this, however, is not by directly equating $M$ types with $[]$ types \cite{quant_graded_modal}.
-It instead does this in a similar way to how others have embedded QTT in Agda \cite{lin_dyn_mult_dep,dep_mult_dep_lin}. 
+It instead does this similarly to how others have embedded QTT in Agda \cite{lin_dyn_mult_dep,dep_mult_dep_lin}. 
 
 Namely, rather than viewing $\tm n t w$ as the \emph{type} $[t]_n$, we instead view it as the \emph{judgment} $[w] : [t]_r$.
-Fortunately, due to the fact that this is Idris 2, we don't need a separate $\Vdash$, as $M$ is a type, which, like any other, can be bound linearly, so, the equivalent to the GrTT statement $\Gamma \vdash [x] : [a]_r$ is $\Gamma \vdash \phi : \tm r a x$, which can be manipulated like any other type.
+Fortunately, due to the fact that this is Idris 2, we don't need a separate $\Vdash$, as $M$ is a type, which, like any other, can be bound linearly, so, the equivalent to the GrTT statement $\Gamma \vdash [x] : [a]_r$ is $\Gamma \vdash \phi : \tm r a x$, which can be manipulated like any other type. 
 
 This is incredibly powerful.
 Not only can we reason about graded modalities in Idris, we can reason about them in the language itself, rather than as part of the syntax, which allows us to employ regular proofs on them.
@@ -168,14 +185,18 @@ Unfortunately, there is no way to prove this in either language, as $M$ can't be
 	\caption{The meta-logical \code{drop} rule and its Idris 2 equivalent}
 \end{figure}
 
+The fact that these are equivalent becomes even more clear when we create \mcombine{}, $\code{split}$, and $\code{join}$ and $\code{expand}$, which are included in the definition of context concatenation and flattening in Granule \cite{dep_mult_dep_lin}.
+
+
 \subsection{Operations on Mu}
 
-There are number of operations that are very important on $M$.
+
+There are a number of operations that are very important on $M$.
 The first of these that we will discuss is combination.
-We define this as $\mcombine : \oldfn1 \_ : {\tm m t w} . \oldfn1 \_ : {\tm n t w} . \tm {(m + n)} t w$\missingcode, and we define it inductively as $\ms \mcombine x \deq x$, and $(a \ms b) \mcombine x \deq a \ms (b \mcombine x)$.
+We define this as $\mcombine : \fa<0>[m]{\nat}{\fa<0>{n}{\nat}{\fn<1>{\tm m t w}{\fn<1>{\tm n t w}{\tm {(m + n)} t w}}}}$\missingcode, and we define it inductively as $\ms \mcombine x \deq x$, and $(a \ms b) \mcombine x \deq a \ms (b \mcombine x)$.
 Note the similarity between the natural number indices and the values, where $0 + x \deq x$ and $(S n) + x \deq S (n + x)$
 
-\todo[cleanup]{Fix the alignement of these}
+\todo[cleanup]{Fix the alignment of these}
 \begin{figure}
 	\begin{align}
 		\mz \mcombine &x &\deq x \\
@@ -189,7 +210,7 @@ Note the similarity between the natural number indices and the values, where $0 
 
 In addition, using the assumption of \ref{remark:mu_grade_eq}, we can liken the function $\mcombine$ to context concatenation \cite{quant_graded_modal}.
 However, unlike Granule, we define this in the language itself.
-Per as a matter of fact, it isn't actually possible to construct \mcombine in Granule, as it would require a way to reason about type level equality, which isn't possible.
+Per as a matter of fact, it isn't actually possible to construct \mcombine in Granule, as it would require a way to reason about type level equality, which isn't possible \cite{granule}.
 
 \begin{lemma}
 	\label{lem:combine_comm}
@@ -200,7 +221,7 @@ Per as a matter of fact, it isn't actually possible to construct \mcombine in Gr
 \end{proof}
 
 Given that we can ``add'' (Or, as we will see later, multiply) two $M$, it would seem natural that we could also subtract them.
-We can this function, which is the inverse of \code{combine}, \code{split}, which has the signature $\code{split}: \oldfn1 n : \nat . \oldfn1 - : {\tm {(m + n)} t w} . {{\tm m t w} \lpair {\tm n t w}}$.
+We can this function, which is the inverse of \code{combine}, \code{split}, which has the signature%  $\code{split}: \fa<0>[m]{\nat}{\fa<1>[n]{\nat}{\fn<1>{\tm {(m + n)} t  }}$.
 We actually use this a fair bit more than we use \code{combine}, as \code{split}doesn't impose any restrictions on the witness, which is very useful for when we discuss \carat types.
 
 In a similar manner to how we proved (in \ref{lem:combine_comm}) the commutativity of \mcombine, we can prove that these are inverses.
@@ -227,46 +248,75 @@ Another relevant construction is multiplicity ``joining'' and its inverse, multi
 
 This is equivalent to flattening of values, and bears the same name as the equivalent monadic operation, \code{join}.
 Just like \mcombine had the inverse \code{split}, \code{join} has the inverse \code{expand}
+Of these, \code{expand} is by far the most complex: the Idris definition of \code{expand} is nearly as long as the other three combined.
+Granted, most of this is just copying values and proofs that various values are equal to each other, but still, this is incredibily long
+
+\begin{definition}
+  We define $\code{expand} : \fa<1>[m]{\nat} \fa<1>[n]{\nat} \fn<1>{\tm{m * n}{t}{w}} {\tm{m}{\tm{n}{t}{w}}{?}}$, which essientally repeatidly applies $\code{split}$ for the number of outer copies, each time splitting off $n$ values, and then turning them into a $\musym$. \footnote{The Idris definition is found at $\code{Data.Grade.Mu.Lemma}$}
+\end{definition}
+
+This serves as the inverse to context flattening, and, when discussing exponential types, is very roughly equivalent to numerical division. \cite{lin_distr}
+
 \subsection{Applications over Mu}
 
-There is still one crucial operation that we have not yet mentioned, and that is application over $M$.
-That is, we want a way to be able to lift a linear function into $M$.
-We can do this, and we call it \code{map}, due to its similarity to functorial lifting and its definition may be found \ref{lst:def_map}.
 
+One of the most important operations possible operations on \musym{} is $\map$, which takes a given linear function $f : \fn<1>[x]{t} (p x)$ and maps it to a function that takes in a type of $\musym$ and returns a type on $\musym$.
+This defines a ``functor'' from the category of linear functions on Idris types to the ``category'' of $\musym$ on its second and third arguement.
+However, \map{} will have a couple cavaets:
 
-However, there is something unsatisfying about \code{map}.
-Namely, the first argument is unrestricted.
-However, we \emph{know} exactly how many of the function we need.
-It will simply be the same as the number of arguments.
+\begin{itemize}
+\item It will have the morphism be external to the linear category, as it will need to use them more than once.
+\item It has to map over \emph{both} the type and the value inside $\musym$. 
+\end{itemize}
 
-So, we define another function, \code{app}, which has the type $\code{app}: \oldfn1 f : {\tm n {(\oldfn1 \_ : t . u)} {w_f}} . \oldfn1 x : {\tm n t {w_x}} . {\tm n u {(w_f w_x)}}$, and a definition given at \ref{lst:def_app}
+\begin{lemma}[Mapping Mu]
+  \label{lem:map_mu}
+  The is a function $\map : \fn<\omega>[f]{(\fn<1>[x]{t} (p x))} \fn<1>{\tm{n}{t}{w}} \tm{n}{(p w)}{(f w)}$
+\end{lemma}
+\begin{proof}
+  We define this by inducting over $n$.
 
-\begin{listing}
-	\begin{multicols}{2}
-		\begin{minted}{idris}
-			app : Mu n (t -@ u) wf -> Mu n t wx -@ Mu n u (wf wx)
-			app MZ MZ = MZ 
-			app (MS f fs) (MS x xs) = MS (f x) (app fs xs)
-		\end{minted}
-		\columnbreak
-		\begin{minted}{idris}
-			map : (f : t -@ u) -> Mu n t w -@ Mu n u (f w)
-			map f MZ = MZ
-			map f (MS x xs) = MS (f x) (map {w=x} f xs)
-		\end{minted}
-	\end{multicols}
-	\caption{Definition of \code{map} and \code{app}}
-	\label{lst:def_map}
-	\label{lst:def_app}
-\end{listing}
+  The first of these cases, of the form $\map : \fn<\omega>[f]{(\fn<1>[x]{t} (p x))} \fn<1>{\tm{0}{t}{w}} \tm{0}{(p w)}{(f w)}$, is trivial, as it is simply $f \mz \deq \mz$.
 
-Notably, if we define a function $\code{genMu}: \oldfn1 x : {!_* t} . \oldfa1 n : \nat . {\tm n t x.{\code{unrestricted}}}$, which is simply defined as $\code{genMu}(\code{MkBang}\_) 0 \deq \mz$ and $\code{genMu}(\code{MkBang}x) (S n) \deq (x \ms (\code{genMu}n (\code{MkBang}x)))$, we can define \code{map}as $\code{map}\{n\} f x \deq \code{app}(\code{genMu}f n) x$ \todo{This isn't exactly correct}.
+  The second of these cases, of the form $\map : \fn<\omega>[f]{(\fn<1>[x]{t} (p x))} \fn<1>{\tm{(S n')}{t}{w}} \tm{(S n')}{(p w)}{(f w)}$, must therefore have a left hand side that ultimately can be split into $x \ms y$, where $w : t$ linearly, and $y : \tm{n'}{t}{w}$, also linearly.
+  We can simply apply $f$ to $w$ to get $f w : p w$, and then on $y$ recurse to get $\map f y : \tm{n'}{p w}{f w}$, which we call $z$.
+  We then can simply combine these with $\ms$ to get $x \ms \map f y$, which has the desired type
+\end{proof}
+
+This equivalent to the fact that we can lift linear functions to graded ones.
+However, one fact about this that isn't quite satisfying is that we use an $\omega$ binding (of $f$), which we are trying to avoid.
+Indeed, we know exactly how many $f$ we need: we apply it exactly $n$ times, so we need exactly $n$ $f$.
+It is for this reason that we construct \code{app}, which acts as the ``internal'' equivalent of \map{}.
+
+\begin{lemma}[Applying Mu]
+  We can construct $\code{app} : \fn<1>{\tm{n}{(\fn<1>{t} u)}{w_f}} \fn<1>{\tm{n}{t}{w_x}} \tm{n}{u}{(w_f w_x)}$
+\end{lemma}
+\begin{proof}
+  This construction is essientally the same as \ref{lem:map_mu}, except now we also induct on the function, however, it is otherwise the exact same.
+\end{proof}
+
+We can actually derive $\code{map}$ from $\code{app}$ and $\code{gen}$, simply as $\map f x \deq \code{app} (\code{gen} f) x$
+This is important: ultimately, we can redefine $\map$ as a simple variation on $\code{app}$ that first moves everything into $\musym$ and then reasons about it.
+We could, of course, have done the same thing in reverse, first reasoning about \code{app} as \code{map}, but this duality is significant for the usage of $\musym$: we don't need to ``go outside'' this linear fragment to get function application. 
+
 
 \subsection{Applicative Mu}
 
+
 We can use \code{app} to derive equivalents of the \code{push} and \code{pull} methods of \granule, in a similar way to how we can use \code{<*>} to define mappings over pairs.
-In Idris, we define $\code{push} : \oldfn1 \_ : \tm n {(\oldsg1 \_ : t . u)} {(\tp1 \_ : w_0 . w_1)} . \oldsg1 \_ : \tm n t w_0 . \tm n u w_1$ and $\code{pull} : \oldfn1 \_ : {\oldsg1 \_ : \tm n t w_0 . \tm n u w_1} . \tm n {(\oldsg1 \_ : t . u)} {(\tp1 \_ : w_0 . w_1)}$.
-Their construction is simple, and may be found in \thislib.
+In Idris, we define $\code{push} : \oldfn1 \_ : \tm n {(\oldsg1 \_ : t . u)} {(\tp1 \_ : w_0 . w_1)} . \oldsg1 \_ : \tm n t w_0 . \tm n u w_1$ and $\code{pull} : \oldfn1 \_ : {\oldsg1 \_ : \tm n t w_0 . \tm n u w_1} . \tm n {(\oldsg1 \_ : t . u)} {(\tp1 \_ : w_0 . w_1)}$. \todo{Expose}
+
+
+\subsection{Infinite Co-Mu}
+
+
+\label{sec:inf_mu}
+
+We also define a coinductive version of mu that works with conatural numbers (as opposed to just natural numbers).
+While these ``co-mu'' types are a extension of mu types, they are much more difficult to work with.
+This is because matching on them no longer involves matching on the result of a constructor \code{MS}, but rather on the result of a function.
+
+To make these slightly easier to work with, we define functions from these \code{CMu} types and \code{Mu} types, as to allow us to re-use the same functions for \code{CMu}. \missingcode{}
 
 %%% Local Variables:
 %%% mode: LaTeX

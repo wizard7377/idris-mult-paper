@@ -1,0 +1,180 @@
+\ProvidesPackage{macros}[2025/11/07]
+
+\NewDocumentCommand{\musym}{}{\ensuremath{\mathcal{M}}}
+\NewDocumentCommand{\Mu}{}{\ensuremath{\mathcal{M}}}
+
+\NewDocumentCommand{\omegasym}{}{\ensuremath{\Omega}}
+
+\NewDocumentCommand{\fn}{d<> o m}{{\ensuremath{%
+			\IfNoValueTF{#2}{#3}{(#2 \colon #3)}%
+			\IfNoValueTF{#1}{\to}{\to_{#1}}% 
+}}}
+
+\NewDocumentCommand{\fa}{d<> o m}{{\ensuremath{%
+			\forall\IfNoValueTF{#2}{#3}{(#2 \colon #3)}%
+			\IfNoValueTF{#1}{\to}{\to_{#1}}% 
+}}}
+
+%Pair types
+
+\NewDocumentCommand{\sg}{d<> o m}{{\ensuremath{%
+			\IfNoValueTF{#1}{%
+                            \Sigma {\IfNoValueTF{#2}{#3}{(#2 \colon #3)}}%
+                        }{%
+                            \Sigma^{#1}_{1} {\IfNoValueTF{#2}{#3}{(#2 \colon #3)}}%
+                        }% 
+}}}
+\NewDocumentCommand{\metaprf}{o}{\cite[][#1]{metamath}}
+\NewDocumentCommand{\et}{d<> o m}{{\ensuremath{%
+			\IfNoValueTF{#1}{\exists}{\exists^{#1}_{0}} {\IfNoValueTF{#2}{#3}{(#2 \colon #3)}}%
+}}}
+\NewDocumentCommand{\sfn}{ O{1} O{\_} m m }{{\ensuremath{%
+			\ifstrequal{#2}{\_}{#3}{(#2 \colon #3)}%
+			\ifstrequal{#1}{*}{\to}{\to_{#1}}% 
+			#4%
+}}}
+
+\NewDocumentCommand{\sfa}{ O{1} O{\_} m m }{{\ensuremath{%
+			\forall\ifstrequal{#2}{\_}{#3}{(#2 \colon #3)}% 
+			\ifstrequal{#1}{*}{\to}{\to_{#1}} #4%
+}}}
+\NewDocumentCommand{\lrule}{mm}{\ensuremath{#1 \vvdash #2}}
+\NewDocumentCommand{\iarg}{m}{{\ensuremath{\{#1\}}}}
+\NewDocumentCommand{\farg}{m}{{\ensuremath{#1}}}
+
+\NewDocumentCommand{\afa}{d<> o m}{{\ensuremath{%
+			\forall\IfNoValueTF{#2}{(#3)}{(#2 \colon #3)}%
+			\IfNoValueTF{#1}{\Rightarrow}{\Rightarrow_{#1}}% 
+}}}
+\NewDocumentCommand{\safa}{e{_}omm}{{\ensuremath{%
+			\forall\IfNoValueTF{#2}{#3}{(#2 \colon #3)}%
+			\IfNoValueTF{#1}{\to}{\to_{#1}}% 
+			#4%
+}}}
+
+\NewDocumentCommand{\formp}{m}{\code{Form'} #1}
+\NewDocumentCommand{\evalp}{m m}{\code{Eval'} #1 #2}
+\NewDocumentCommand{\fsolve}{o m m}{\ensuremath{ \IfValueTF {#1} {\et<1>[#1]{\nat}{(\evalp{#2}{#1} \peq #3})} {#2 \ni #3} }}
+
+\NewDocumentCommand{\funify}{o m m}{\ensuremath{ \IfValueTF {#1}
+    {\fa<1>[#1]{\nat} (\fn<1>{\fsolve{#2}{#1}}  \fsolve{#3}{#1})}
+    {#2 \sqsubseteq #3}
+  }
+}
+\NewDocumentCommand{\conat}{}{\ensuremath{\mathbb{N}_\infty{}}}
+\NewDocumentCommand{\cosuc}{m}{\ensuremath{S_\infty{} \ #1}}
+\NewDocumentCommand{\conil}{}{\ensuremath{0_\infty}}
+\NewDocumentCommand{\cofin}{m}{\ensuremath{{\code{Fin}_{\nat{}} \ {#1}}}}
+\NewDocumentCommand{\cofix}{}{\ensuremath{\infty_{\nat{}}}}
+
+
+%\Def\afa#1#2 :#3.#4 {{\ensuremath{%
+%			\forall\ifstrequal{#2}{\_}{#3}{(#2 \colon #3)}% 
+%			\ifstrequal{#1}{*}{\Rightarrow}{\Rightarrow_{#1}} #4%
+%}}}
+
+\def\tp#1 #2 :#3.#4 {{\ensuremath{%
+			\ifstrequal{#2}{\_}{#3}{(#2 \colon #3)}% 
+			\ifstrequal{#1}{*}{{*}}{{*}_{#1}} #4%
+}}}
+\def\te#1#2:#3.#4 {{\ensuremath{%
+			\ifstrequal{#1}{*}{\exists}{\exists_{#1}}% 
+			\ifstrequal{#2}{\_}{#3}{(#2 \colon #3)} . #4%
+}}}
+\def\for#1:#2.#3 {{\ensuremath{\fa0 {#1}:{#2}.{#3} }}}
+
+%\def\tw#1#2#3 {{\ensuremath{\tomega \ #1 \ #2 \ #3}}}
+%If star, custom val (second), if otherwise with underscore, expand
+\NewDocumentCommand{\tw}{sommm}{\ensuremath{%
+	\IfBooleanTF{#1}
+		{{\fn<1>[#2]{\nat} \afa<0>{#2 \in #3} {M \ #2 \ #4 \ #5 }}}%
+		{%
+		\IfNoValueTF{#2}
+			{\Omega \ #3 \ #4 \ #5}%
+			{\fn<1>[#2]{\nat}{\musym \ #2 \ #4 \ #5 }}%
+		}%
+}}
+
+
+\NewDocumentCommand{\txp}{oomm}{\ensuremath{%
+    \IfValueTF{#1}{%
+      \IfValueTF{#2}{%
+        \et<1>[#1]{#4} {\tw*[#2]{#3}{#4}{#1}}%
+      }{%
+        \et<1>[#1]{#4} {\tw{#3}{#4}{#1}}%
+      }%
+    }{%
+      {#4}^{#3}%
+    }%
+} \xspace}
+\NewDocumentCommand{\code}{m}{\xspace{\ensuremath{\mathtt{#1}}}\xspace}
+\NewDocumentCommand{\feval}{mm}{\ensuremath{\code{Eval} #1 #2 }}
+\NewDocumentCommand{\map}{}{\code{map}}
+%\newcommand{\code}[1]{\ensuremath{\mathtt{#1}\xspace}}
+%\newmintinline[code]{idris}{}
+\def\needcite{{\todo[citation]{Need citation}}}
+\def\needciteof #1 {{\todo[citation]{Need citation for #1}}}
+\def\missingcode{{\todo[missingcode]{Need code}}}
+\def\expandthis{{\todo[cleanup]{Expand more on this}}}
+\def\finishthis{{\todo[finish]{Finish this}}}
+\NewDocumentCommand{\addref}{o}{\IfValueTF{#1}{\todo{Add ref to #1}}{Add ref}}
+\def\marker #1 {{\todo[missingcode]{#1}}}
+\def\pred#1{{\ensuremath{\code{Pred} \ #1}}}
+\def\granule{Granule}
+\def\idris{Idris}
+\def\thislib{\code{idris-mult}\ref{sec:this_lib}}
+\newcommand{\set}[1]{\ensuremath{\code{Set}\xspace#1}}
+
+\def\vform{{\code{Form}}}
+\def\veval{{\code{Eval}}}
+\newcommand{\seq}{\ensuremath{=_{\code{Set}}}}
+\newcommand{\sunion}{\ensuremath{\cup_{\code{Set}}}}
+\newcommand{\sinter}{\ensuremath{\cap_{\code{Set}}}}
+\newcommand{\sfalse}{\ensuremath{\bot_{\code{Set}}}}
+\newcommand{\strue}{\ensuremath{\top_{\code{Set}}}}
+\newcommand{\selem}{\ensuremath{\in_{\code{Set}}}}
+\def\ident #1 {\ensuremath{\texttt{#1}}\xspace}
+\def\sigil #1 {\ensuremath{#1}\xspace}
+
+\newcommand{\funwith}[1][\ensuremath{*}]{\ensuremath{\to_#1}}
+\newcommand{\proc}{\ensuremath{\gls{sym:lmap}}}
+\newcommand{\abst}{\ensuremath{\gls{sym:efun}}}
+\newcommand{\mz}{\gls{cons:exhaust}}
+\newcommand{\ms}{\gls{cons:provide}}
+\newcommand{\nsum}{\gls{cons:provide}}
+\newcommand{\tmu}{\musym{}}
+\NewDocumentCommand{\tm}{mmm}{\ensuremath{\tmu \ #1 \ #2 \ #3}}
+\NewDocumentCommand{\stm}{ m m m }{{\ensuremath{\tmu \ #1 \ #2 \ #3}}}
+\newcommand{\tomega}{\gls{type:Omega}}
+
+\newcommand{\mcombine}{\ensuremath{\otimes}} %TODO: Link to gloss
+\newcommand{\nat}{\gls{type:nats}}
+\newcommand{\tpe}{\gls{type:tpe}}
+\newcommand{\tset}{\ensuremath{\text{Part}}}
+\newcommand{\redux}{\ensuremath{\vartriangleright}}
+%\newcommand{\fa}[1]{{\gls{sym:forall}}_{#1}}
+%\def\for#1:#2.#3{\ensuremath{\{#1 : #2\} \gls{sym:efun} #3}}
+%\newcommand{\fa}[1]{\ensuremath{#1 \gls{sym:forall}}}
+\def\ufun#1#2{{\ensuremath{#1 \gls{sym:efun} #2}}}
+\newcommand{\liso}{\ensuremath{\cong_1}}
+\newcommand{\nuse}[2]{\ensuremath{{#1}\#{#2}}}
+\newcommand{\lpair}{\ensuremath{\times^1}} %TODO: Link to gloss
+\newcommand{\ltup}{\ensuremath{*^1}} %TODO: Link to gloss
+\newcommand{\liniso}{\ensuremath{\cong_{\multimap}}}
+\newcommand{\carat}{\text{\textsuperscript{$\wedge$}}}
+\newcommand{\ccarat}{\carat\carat} %TODO: Find a less stupid way to do this
+\newcommand{\lincomp}[1][]{\ensuremath{\ifblank{#1}{\circ^1}{\circ^1_{#1}}}}
+\newcommand{\ecomp}[1][]{\ensuremath{\ifblank{#1}{\circ^{\exists_1}}{\circ^{\exists_1}_{#1}}}}
+\newcommand{\eomega}[4][n]{\ensuremath{{\fn1 #1 : \nat . \afa0 {\code{prf}} : {(#2 \ #1)} . {\tmu \ #1 \ #3 \ #4}}}}
+\newcommand{\deq}{\ensuremath{:=}}
+\newcommand{\wrap}[1]{{\ensuremath{(#1)}}}
+\newcommand{\expexi}[4][n]{\ensuremath{\te1 #4 : #3 . \eomega[#1]{#2}{#3}{#4}}}
+\newcommand{\subform}{\sqsubseteq}
+\NewDocumentCommand{\apply}{m m}{\ensuremath{\code{#1} \ #2}}
+\NewDocumentCommand{\icat}{}{\code{Idr}}
+\NewDocumentCommand{\fadd}{mm}{{\ensuremath{#1 \oplus #2}}}
+\NewDocumentCommand{\fmul}{mm}{{\ensuremath{#1 \otimes #2}}}
+%%% Local Variables:
+%%% mode: LaTeX
+%%% TeX-master: "main"
+%%% End:
